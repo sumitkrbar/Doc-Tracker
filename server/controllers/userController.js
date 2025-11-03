@@ -10,7 +10,7 @@ const generateToken = (userId) =>{
 export const registerController = async (req, res) => {
     try {
         const { username, email, password } = req.body;
-        console.log("hereee");
+    
         
         if(!username || !email || !password){
             throw new Error("Required fields are missing");
