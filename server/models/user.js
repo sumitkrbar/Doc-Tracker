@@ -10,6 +10,10 @@ const userSchema = new mongoose.Schema({
     required: true,
     unique: true
   },
+  password:{
+        type: String,
+        required: true,
+},
   // storing reference to documents also if needed
   documents: [
     {
@@ -17,6 +21,6 @@ const userSchema = new mongoose.Schema({
       ref: "Document"
     }
   ]
-});
+},{timestamps: true});
 
 export default mongoose.model("User", userSchema);
