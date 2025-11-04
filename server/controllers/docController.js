@@ -98,6 +98,22 @@ export const getFilteredDocsController = async (req, res) => {
             authEnd
         } = req.query;
 
+        const hasFilters =
+            owner ||
+            vehicleNumber ||
+            cfStart ||
+            cfEnd ||
+            npStart ||
+            npEnd ||
+            authStart ||
+            authEnd;
+
+        if (!hasFilters) {
+            return res.status(400).json({
+                success: false,
+                message: "Please provide at least one filter parameter.",
+            });
+        }
         // Build base query
         const query = { user: _id };
         
@@ -119,7 +135,8 @@ export const getFilteredDocsController = async (req, res) => {
 
         const authQuery = buildDateRangeQuery(authStart, authEnd);
         if (authQuery) query.auth = authQuery;
-
+        //console.log(query);
+        
         // Execute query
         const documents = await Document.find(query)
             .sort({ createdAt: -1 })
@@ -140,6 +157,37 @@ export const getFilteredDocsController = async (req, res) => {
 
     } catch (error) {
         console.error("Error in getFilteredDocsController:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to fetch documents", 
+            error: error.message 
+        });
+    }
+};
+
+
+export const getAllDocsController = async (req, res) => {
+    try {
+        const { _id } = req.user;
+        const query = { user: _id };
+        const documents = await Document.find(query)
+            .sort({ createdAt: -1 })
+            .lean()
+            .exec();
+        if(documents.length === 0){
+            return res.status(404).json({ 
+                success: false, 
+                message: "No documents found" 
+            });
+        }
+        res.json({ 
+            success: true, 
+            count: documents.length,
+            documents 
+        });
+
+    } catch (error) {
+        console.error("Error in getAllDocsController:", error);
         res.status(500).json({ 
             success: false, 
             message: "Failed to fetch documents", 
