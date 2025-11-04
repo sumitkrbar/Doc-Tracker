@@ -19,8 +19,8 @@ const validateDocumentInput = ({ owner, vehicleNumber, userId }) => {
  */
 export const addDocController = async (req, res) => {
     try {
-        const { owner, phone, vehicleNumber, cf, np, auth, remarks, userId } = req.body;
-        
+        const { owner, phone, vehicleNumber, cf, np, auth, remarks } = req.body;
+        const userId = req.user._id;
         // Validate required fields
         validateDocumentInput({ owner, vehicleNumber, userId });
 
@@ -125,7 +125,13 @@ export const getFilteredDocsController = async (req, res) => {
             .sort({ createdAt: -1 })
             .lean() // Convert to plain JS objects for better performance
             .exec();
-
+        
+        if(documents.length === 0){
+            return res.status(404).json({ 
+                success: false, 
+                message: "No documents found matching the criteria" 
+            });
+        }
         res.json({ 
             success: true, 
             count: documents.length,
