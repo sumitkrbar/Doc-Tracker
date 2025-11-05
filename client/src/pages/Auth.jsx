@@ -7,38 +7,53 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { FileText } from "lucide-react";
+import { toast } from "react-hot-toast";
+import { useAuth } from "../contexts/AuthContext";
 
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { toast } = useToast();
-
-  const handleLogin = (e) => {
+  const { login } = useAuth();
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
+  const handleLogin = async (e) => {
+    //console.log(e);
+    
     e.preventDefault();
+    if(isLoading) return;
+
     setIsLoading(true);
 
-    setTimeout(() => {
-    //   toast({
-    //     title: "Login successful",
-    //     description: "Welcome back!",
-    //   });
+    if(!email || !password){
+        toast.error("Please fill all fields");
+        setIsLoading(false);
+        return;
+    }
+
+    try {
+      
+      await login(email, password);
+      toast.success("Login successful");
       navigate("/dashboard");
+      
+    } catch (error) {
+      toast.error("Invalid credentials");
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleSignup = (e) => {
     e.preventDefault();
+    if(isLoading) return;
     setIsLoading(true);
+    if(!email || !password || !name){
+        toast.error("Please fill all fields");
+        setIsLoading(false);
+        return;
+    }
 
-    setTimeout(() => {
-    //   toast({
-    //     title: "Account created",
-    //     description: "Welcome to the platform!",
-    //   });
-      navigate("/dashboard");
-      setIsLoading(false);
-    }, 1000);
   };
 
   return (
@@ -70,11 +85,13 @@ const Auth = () => {
                 <form onSubmit={handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" placeholder="name@example.com" required />
+                    <Input id="login-email" type="email" placeholder="name@example.com"
+                    onChange={(e) => setEmail(e.target.value)}
+                    required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
-                    <Input id="login-password" type="password" required />
+                    <Input id="login-password" type="password" onChange={(e) => setPassword(e.target.value)} required />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Logging in..." : "Login"}
@@ -86,15 +103,20 @@ const Auth = () => {
                 <form onSubmit={handleSignup} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
-                    <Input id="signup-name" type="text" placeholder="John Doe" required />
+                    <Input 
+                      id="signup-name" 
+                      type="text" 
+                      placeholder="John Doe"
+                      onChange={(e) => setName(e.target.value)}
+                      required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input id="signup-email" type="email" placeholder="name@example.com" required />
+                    <Input id="signup-email" type="email" placeholder="name@example.com" onChange={(e) => setEmail(e.target.value)} required />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input id="signup-password" type="password" required />
+                    <Input id="signup-password" type="password" onChange={(e) => setPassword(e.target.value)} required />
                   </div>
                   <Button type="submit" className="w-full" disabled={isLoading}>
                     {isLoading ? "Creating account..." : "Create Account"}
