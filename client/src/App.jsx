@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DocumentProvider } from "./contexts/DocumentContext";
 import toast, { Toaster } from 'react-hot-toast'
+import ProtectedRoute from "./components/ProtectedRoute";
 function App() {
 
   return (
@@ -14,7 +15,14 @@ function App() {
       <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route 
+              path="/dashboard" 
+              element={
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              } 
+            />
             <Route path="/auth" element={<Auth />} />
           </Routes>
           <Toaster />

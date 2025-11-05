@@ -47,9 +47,7 @@ export const registerController = async (req, res) => {
 };   
 
 export const loginController = async (req, res) => {
-    try {
-        console.log(req.body);
-        
+    try {        
         const { email, password } = req.body;
         if(!email || !password){
             throw new Error("Required fields are missing");
@@ -66,7 +64,6 @@ export const loginController = async (req, res) => {
         
         const userWithoutPassword = user.toObject();
         delete userWithoutPassword.password;
-        console.log(userWithoutPassword, token);
         
         res.json({
             success: true,

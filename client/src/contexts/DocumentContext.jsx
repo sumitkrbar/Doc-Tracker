@@ -3,32 +3,8 @@ import { createContext, useContext, useState } from "react";
 const DocumentContext = createContext(undefined);
 
 export const DocumentProvider = ({ children }) => {
-  const [documents, setDocuments] = useState([
-    {
-      id: "1",
-      owner: "John Doe",
-      phone: 9876543210,
-      vehicleNumber: "ABC-1234",
-      cf: new Date("2024-12-31"),
-      np: new Date("2024-11-30"),
-      auth: new Date("2025-11-15"),
-      remarks: "Regular maintenance required",
-      createdAt: new Date("2024-01-15"),
-      updatedAt: new Date("2024-01-15"),
-    },
-    {
-      id: "2",
-      owner: "Jane Smith",
-      phone: 9123456789,
-      vehicleNumber: "XYZ-5678",
-      cf: new Date("2024-11-20"),
-      np: new Date("2024-12-15"),
-      auth: new Date("2025-02-01"),
-      remarks: "New vehicle",
-      createdAt: new Date("2024-02-01"),
-      updatedAt: new Date("2024-02-01"),
-    },
-  ]);
+  
+  const [documents, setDocuments] = useState([]);
 
   const addDocument = (document) => {
     const newDocument = {

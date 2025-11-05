@@ -20,7 +20,10 @@ const Dashboard = () => {
 
   const handleLogout = () => {
     logout();
-    navigate("/");
+    // Use setTimeout to ensure navigation happens after state updates
+    setTimeout(() => {
+      navigate("/");
+    }, 0);
   };
 
   const handleGetAllDocuments = () => {
@@ -80,7 +83,7 @@ const Dashboard = () => {
 
             <Button onClick={handleGetAllDocuments} variant="outline" className="gap-2">
               <RefreshCw className="h-4 w-4" />
-              Refresh All
+              Get All Documents
             </Button>
 
             <Button onClick={() => setIsAddDialogOpen(true)} className="gap-2">
