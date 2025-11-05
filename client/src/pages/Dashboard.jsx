@@ -46,7 +46,7 @@ const Dashboard = () => {
             <div>
               <h1 className="text-2xl font-bold text-foreground">Document Manager</h1>
               <p className="text-sm text-muted-foreground">
-                Welcome back, {user?.name}
+                Welcome back, {user?.username}
               </p>
             </div>
             <div className="flex items-center gap-2">

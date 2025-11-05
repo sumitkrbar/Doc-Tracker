@@ -13,12 +13,12 @@ import { useAuth } from "../contexts/AuthContext";
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login } = useAuth();
+  const { login, signup } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+
   const handleLogin = async (e) => {
-    //console.log(e);
     
     e.preventDefault();
     if(isLoading) return;
@@ -32,7 +32,7 @@ const Auth = () => {
     }
 
     try {
-      
+
       await login(email, password);
       toast.success("Login successful");
       navigate("/dashboard");
@@ -44,14 +44,26 @@ const Auth = () => {
     }
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => {
     e.preventDefault();
     if(isLoading) return;
+
     setIsLoading(true);
+
     if(!email || !password || !name){
         toast.error("Please fill all fields");
         setIsLoading(false);
         return;
+    }
+    try {
+      await signup(email, password, name);
+      toast.success("Account created successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error("Signup failed");
+      console.log(error);
+    } finally {
+      setIsLoading(false);
     }
 
   };

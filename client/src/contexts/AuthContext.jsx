@@ -8,13 +8,19 @@ export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [token, setToken] = useState(null);
 
+  useEffect(() => {
+    const storedUser = localStorage.getItem("user");
+    const storedToken = localStorage.getItem("token");
+    if (storedUser && storedToken) {
+      setUser(JSON.parse(storedUser));
+      setToken(storedToken);
+    }
+  }, []);
+
 
   const login = async (email, password) => {
     try {
       const { data } = await axios.post("http://localhost:5000/api/login", { email, password });
-      console.log("inside login");
-      
-      console.log(data);
       
       if (data.success) {
         setToken(data.token);
@@ -34,17 +40,17 @@ export const AuthProvider = ({ children }) => {
     
     try{
       const { data } = await axios.post(`http://localhost:5000/api/register`, {username: name, email, password})
-      console.log(data);
+
       if(data.success){
           setUser(data.user);
           localStorage.setItem("user", JSON.stringify(data.user));
+          setToken(data.token);
+          localStorage.setItem("token", data.token);
       } else{
           toast.error(data.message)
       }
     }catch(error){
           toast.error(error.message)
-    }finally{
-        setLoading(false);
     }
   };
 

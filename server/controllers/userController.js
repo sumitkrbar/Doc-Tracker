@@ -30,7 +30,15 @@ export const registerController = async (req, res) => {
         });
 
         const token = generateToken(newUser._id.toString());
-        res.json({ success: true, message: "User registered successfully", user: newUser, token });
+        const userWithoutPassword = newUser.toObject();
+        delete userWithoutPassword.password;
+
+        res.json({
+            success: true,
+            message: "Registration successful",
+            user: userWithoutPassword,
+            token
+        });
 
     } catch (error) {
         console.error("Error in registerController:", error);
@@ -40,6 +48,8 @@ export const registerController = async (req, res) => {
 
 export const loginController = async (req, res) => {
     try {
+        console.log(req.body);
+        
         const { email, password } = req.body;
         if(!email || !password){
             throw new Error("Required fields are missing");
@@ -53,8 +63,17 @@ export const loginController = async (req, res) => {
             return res.status(400).json({ success: false, message: "wrong Password" });
         }
         const token = generateToken(user._id.toString());
-        res.json({ success: true, message: "Login successful", user, token });
-
+        
+        const userWithoutPassword = user.toObject();
+        delete userWithoutPassword.password;
+        console.log(userWithoutPassword, token);
+        
+        res.json({
+            success: true,
+            message: "Login successful",
+            user: userWithoutPassword,
+            token
+        });
 
     } catch (error) {
         console.error("Error in loginController:", error);
