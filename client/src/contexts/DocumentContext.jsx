@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useState } from "react";
-import axios from "axios";
+import api from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
 const DocumentContext = createContext(undefined);
@@ -23,8 +23,9 @@ export const DocumentProvider = ({ children }) => {
       try {
         setDocumentsLoading(true);
         const token = localStorage.getItem("token");
-        const { data } = await axios.get("http://localhost:5000/api/get-doc/recent?limit=5", {
+        const { data } = await api.get("/get-doc/recent", {
           headers: { Authorization: token ? `Bearer ${token}` : "" },
+          params: { limit: 5 },
         });
 
         if (data && data.success && Array.isArray(data.documents)) {
@@ -53,7 +54,7 @@ export const DocumentProvider = ({ children }) => {
     setDocumentsLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const { data } = await axios.get("http://localhost:5000/api/get-doc/all", {
+      const { data } = await api.get("/get-doc/all", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
       });
       if (data && data.success && Array.isArray(data.documents)) {
@@ -105,7 +106,7 @@ export const DocumentProvider = ({ children }) => {
         params.authEnd = d;
       }
 
-      const { data } = await axios.get("http://localhost:5000/api/get-doc/filter", {
+      const { data } = await api.get("/get-doc/filter", {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
         params,
       });
@@ -139,7 +140,7 @@ export const DocumentProvider = ({ children }) => {
         remarks: document.remarks,
       };
 
-      const { data } = await axios.post("http://localhost:5000/api/add-doc", payload, {
+      const { data } = await api.post("/add-doc", payload, {
         headers: {
           Authorization: token ? `Bearer ${token}` : "",
         },
