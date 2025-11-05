@@ -10,7 +10,7 @@ import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
 const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
-  const [localFilters, setLocalFilters] = useState(filters);
+  const [localFilters, setLocalFilters] = useState(filters || {});
 
   const handleApply = () => {
     onApplyFilters(localFilters);
@@ -53,84 +53,162 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
         </div>
 
         <div className="space-y-2">
-          <Label>CF Expiry Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !localFilters.cfExpiry && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {localFilters.cfExpiry ? format(localFilters.cfExpiry, "PPP") : "Pick date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={localFilters.cfExpiry}
-                onSelect={(date) => setLocalFilters({ ...localFilters, cfExpiry: date })}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <Label>CF Expiry Range</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.cfStart && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.cfStart ? format(localFilters.cfStart, "PPP") : "Start"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.cfStart}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, cfStart: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.cfEnd && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.cfEnd ? format(localFilters.cfEnd, "PPP") : "End"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.cfEnd}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, cfEnd: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label>NP Expiry Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !localFilters.npExpiry && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {localFilters.npExpiry ? format(localFilters.npExpiry, "PPP") : "Pick date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={localFilters.npExpiry}
-                onSelect={(date) => setLocalFilters({ ...localFilters, npExpiry: date })}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <Label>NP Expiry Range</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.npStart && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.npStart ? format(localFilters.npStart, "PPP") : "Start"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.npStart}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, npStart: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.npEnd && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.npEnd ? format(localFilters.npEnd, "PPP") : "End"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.npEnd}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, npEnd: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="space-y-2">
-          <Label>Auth Expiry Date</Label>
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button
-                variant="outline"
-                className={cn(
-                  "w-full justify-start text-left font-normal",
-                  !localFilters.authExpiry && "text-muted-foreground"
-                )}
-              >
-                <CalendarIcon className="mr-2 h-4 w-4" />
-                {localFilters.authExpiry ? format(localFilters.authExpiry, "PPP") : "Pick date"}
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent className="w-auto p-0" align="start">
-              <Calendar
-                mode="single"
-                selected={localFilters.authExpiry}
-                onSelect={(date) => setLocalFilters({ ...localFilters, authExpiry: date })}
-                initialFocus
-                className="pointer-events-auto"
-              />
-            </PopoverContent>
-          </Popover>
+          <Label>Auth Expiry Range</Label>
+          <div className="grid grid-cols-2 gap-2">
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.authStart && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.authStart ? format(localFilters.authStart, "PPP") : "Start"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.authStart}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, authStart: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !localFilters.authEnd && "text-muted-foreground"
+                  )}
+                >
+                  <CalendarIcon className="mr-2 h-4 w-4" />
+                  <span className="block whitespace-normal">{localFilters.authEnd ? format(localFilters.authEnd, "PPP") : "End"}</span>
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={localFilters.authEnd}
+                  onSelect={(date) => setLocalFilters({ ...localFilters, authEnd: date })}
+                  initialFocus
+                  className="pointer-events-auto"
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
         </div>
 
         <div className="flex items-end">

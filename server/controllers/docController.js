@@ -26,14 +26,23 @@ export const addDocController = async (req, res) => {
 
         // Format and create document
         const formattedVehicleNumber = vehicleNumber.toUpperCase().trim();
+        // Normalize phone to a Number when possible. The client may send phone as number or string.
+        let phoneValue;
+        if (phone !== undefined && phone !== null && String(phone).trim() !== "") {
+            const parsed = Number(String(phone).trim());
+            phoneValue = Number.isNaN(parsed) ? undefined : parsed;
+        } else {
+            phoneValue = undefined;
+        }
+
         const newDocument = new Document({
-            owner: owner.trim(),
-            phone: phone?.trim(),
+            owner: typeof owner === 'string' ? owner.trim() : owner,
+            phone: phoneValue,
             vehicleNumber: formattedVehicleNumber,
             cf: cf || null,
             np: np || null,
             auth: auth || null,
-            remarks: remarks?.trim(),
+            remarks: typeof remarks === 'string' ? remarks.trim() : remarks,
             user: userId
         });
 
@@ -191,6 +200,40 @@ export const getAllDocsController = async (req, res) => {
         res.status(500).json({ 
             success: false, 
             message: "Failed to fetch documents", 
+            error: error.message 
+        });
+    }
+};
+
+/**
+ * Controller to get recent documents (limited)
+ */
+export const getRecentDocsController = async (req, res) => {
+    try {
+        const { _id } = req.user;
+        const limit = parseInt(req.query.limit, 10) || 5;
+        const query = { user: _id };
+        const documents = await Document.find(query)
+            .sort({ createdAt: -1 })
+            .limit(limit)
+            .lean()
+            .exec();
+        if(documents.length === 0){
+            return res.status(404).json({ 
+                success: false, 
+                message: "No documents found" 
+            });
+        }
+        res.json({ 
+            success: true, 
+            count: documents.length,
+            documents 
+        });
+    } catch (error) {
+        console.error("Error in getRecentDocsController:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to fetch recent documents", 
             error: error.message 
         });
     }

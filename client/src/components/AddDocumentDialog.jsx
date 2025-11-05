@@ -12,16 +12,14 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { useToast } from "@/hooks/use-toast";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
-
+import { toast } from "react-hot-toast";
 const AddDocumentDialog = ({ open, onOpenChange }) => {
   const { addDocument } = useDocuments();
-  const { toast } = useToast();
 
   const [formData, setFormData] = useState({
     owner: "",
@@ -33,44 +31,51 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
     remarks: "",
   });
 
-  const handleSubmit = (e) => {
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const handleSubmit = async (e) => {
+    console.log("add button clicked");
+
     e.preventDefault();
 
     if (!formData.owner || !formData.vehicleNumber) {
-      toast({
-        title: "Missing required fields",
-        description: "Owner and Vehicle Number are required.",
-        variant: "destructive",
-      });
+      toast.error("Owner and Vehicle Number are required.");
       return;
     }
+    console.log("before addDocument");
 
-    addDocument({
-      owner: formData.owner,
-      phone: formData.phone ? Number(formData.phone) : undefined,
-      vehicleNumber: formData.vehicleNumber,
-      cf: formData.cf,
-      np: formData.np,
-      auth: formData.auth,
-      remarks: formData.remarks,
-    });
+    setIsSubmitting(true);
+    try {
+      await addDocument({
+        owner: formData.owner,
+        phone: formData.phone ? Number(formData.phone) : undefined,
+        vehicleNumber: formData.vehicleNumber,
+        cf: formData.cf,
+        np: formData.np,
+        auth: formData.auth,
+        remarks: formData.remarks,
+      });
 
-    toast({
-      title: "Document added",
-      description: "The document has been successfully added to the system.",
-    });
+      toast.success("Document added — the document has been successfully added to the system.");
 
-    setFormData({
-      owner: "",
-      phone: "",
-      vehicleNumber: "",
-      cf: undefined,
-      np: undefined,
-      auth: undefined,
-      remarks: "",
-    });
+      setFormData({
+        owner: "",
+        phone: "",
+        vehicleNumber: "",
+        cf: undefined,
+        np: undefined,
+        auth: undefined,
+        remarks: "",
+      });
 
-    onOpenChange(false);
+      onOpenChange(false);
+    } catch (error) {
+      const message = error?.response?.data?.message || error?.message || "Failed to add document";
+      toast.error(message);
+      console.error("Add document failed:", error);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -132,7 +137,7 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
                         )}
                       >
                         <CalendarIcon className="mr-2 h-4 w-4" />
-                        {formData[field] ? format(formData[field], "PPP") : "Pick date"}
+                        <span className="block whitespace-normal">{formData[field] ? format(formData[field], "PPP") : "Pick date"}</span>
                       </Button>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
@@ -164,7 +169,9 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
               Cancel
             </Button>
-            <Button type="submit">Add Document</Button>
+            <Button type="submit" disabled={isSubmitting}>
+              {isSubmitting ? "Adding..." : "Add Document"}
+            </Button>
           </DialogFooter>
         </form>
       </DialogContent>

@@ -1,8 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/contexts/DocumentContext";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { LogOut, Plus, Filter, RefreshCw } from "lucide-react";
 import DocumentTable from "@/components/DocumentTable";
 import AddDocumentDialog from "@/components/AddDocumentDialog";
@@ -10,13 +11,24 @@ import FilterPanel from "@/components/FilterPanel";
 
 const Dashboard = () => {
   const { user, logout } = useAuth();
-  const { getAllDocuments, getFilteredDocuments } = useDocuments();
+  const { documents, getAllDocuments, refreshDocuments, fetchFilteredDocuments, documentsMode, documentsLoading } = useDocuments();
   const navigate = useNavigate();
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
-  const [displayedDocuments, setDisplayedDocuments] = useState(getAllDocuments());
+  const [displayedDocuments, setDisplayedDocuments] = useState([]);
+
+  
+
+  // Keep displayed documents in sync with the global documents.
+  // When filters are active, re-apply them; otherwise show all documents.
+  // Sync displayed documents with context documents only when no filters are active.
+  useEffect(() => {
+    if (!filters || Object.keys(filters).length === 0) {
+      setDisplayedDocuments(getAllDocuments());
+    }
+  }, [documents]);
 
   const handleLogout = () => {
     logout();
@@ -26,14 +38,16 @@ const Dashboard = () => {
     }, 0);
   };
 
-  const handleGetAllDocuments = () => {
+  const handleGetAllDocuments = async () => {
     setFilters({});
-    setDisplayedDocuments(getAllDocuments());
+    const all = await refreshDocuments();
+    setDisplayedDocuments(all);
   };
 
-  const handleApplyFilters = (newFilters) => {
+  const handleApplyFilters = async (newFilters) => {
     setFilters(newFilters);
-    setDisplayedDocuments(getFilteredDocuments(newFilters));
+    const results = await fetchFilteredDocuments(newFilters);
+    setDisplayedDocuments(results);
   };
 
   const handleClearFilters = () => {
@@ -65,10 +79,15 @@ const Dashboard = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h2 className="text-xl font-semibold text-foreground">Documents</h2>
-            <p className="text-sm text-muted-foreground">
-              Manage your vehicle documentation records
-            </p>
+            <div className="flex items-center gap-3">
+              <h2 className="text-xl font-semibold text-foreground">Documents</h2>
+              {documentsMode === "recent" ? (
+                <Badge className="bg-muted text-foreground">Showing recent</Badge>
+              ) : (
+                <Badge className="bg-muted text-foreground">Showing all</Badge>
+              )}
+            </div>
+            <p className="text-sm text-muted-foreground">Manage your vehicle documentation records</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -101,7 +120,7 @@ const Dashboard = () => {
           />
         )}
 
-        <DocumentTable documents={displayedDocuments} />
+  <DocumentTable documents={displayedDocuments} loading={documentsLoading} />
       </main>
 
       <AddDocumentDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
