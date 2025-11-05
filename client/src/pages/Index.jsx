@@ -6,40 +6,40 @@ const Index = () => {
   const navigate = useNavigate();
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Navigation */}
-      <nav className="container mx-auto px-4 py-6 flex justify-between items-center">
+      <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
         <h1
-          className="text-2xl font-bold text-primary cursor-pointer hover:opacity-80 transition-opacity"
+          className="text-2xl font-extrabold text-blue-600 cursor-pointer hover:opacity-90 transition-opacity"
           onClick={() => navigate("/")}
         >
           DocuTrack Pro
         </h1>
         <Link to="/auth">
-          <Button>Get Started</Button>
+          <Button className="bg-blue-600 text-white hover:bg-blue-700">Get Started</Button>
         </Link>
       </nav>
 
       {/* Hero Section */}
-      <div className="container mx-auto px-4 py-12">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-accent px-4 py-2 text-sm text-accent-foreground">
+      <div className="container mx-auto px-6 py-16">
+        <div className="max-w-5xl mx-auto text-center">
+          <div className="mb-8 inline-flex items-center gap-2 rounded-full bg-blue-50 px-4 py-2 text-sm text-blue-600">
             <FileText className="h-4 w-4" />
             Document Management System
           </div>
 
-          <h1 className="mb-6 text-5xl font-bold tracking-tight text-foreground">
+          <h1 className="mb-6 text-6xl font-extrabold tracking-tight text-slate-900 leading-tight">
             Manage Your Documents
-            <span className="block text-primary mt-2">Simply & Securely</span>
+            <span className="block text-blue-600 mt-2">Simply & Securely</span>
           </h1>
 
-          <p className="mb-8 text-xl text-muted-foreground max-w-2xl mx-auto">
+          <p className="mb-10 text-lg text-slate-500 max-w-3xl mx-auto">
             A powerful platform to store, organize, and access your documents with advanced filtering capabilities.
           </p>
 
           <div className="flex gap-4 justify-center">
             <Link to="/auth">
-              <Button size="lg" className="gap-2">
+              <Button size="lg" className="gap-2 bg-blue-600 text-white hover:bg-blue-700">
                 <Lock className="h-5 w-5" />
                 Get Started
               </Button>
@@ -48,33 +48,33 @@ const Index = () => {
         </div>
 
         {/* Features */}
-        <div className="mt-24 grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-          <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
-            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <Plus className="h-6 w-6 text-primary" />
+        <div className="mt-24 grid md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+            <div className="h-14 w-14 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+              <Plus className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-card-foreground">Add Documents</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-xl font-semibold mb-2 text-slate-900">Add Documents</h3>
+            <p className="text-slate-500">
               Easily upload and organize your documents with metadata
             </p>
           </div>
 
-          <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
-            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <Filter className="h-6 w-6 text-primary" />
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+            <div className="h-14 w-14 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+              <Filter className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-card-foreground">Smart Filtering</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-xl font-semibold mb-2 text-slate-900">Smart Filtering</h3>
+            <p className="text-slate-500">
               Find documents quickly with powerful search and filters
             </p>
           </div>
 
-          <div className="bg-card rounded-lg p-6 border border-border shadow-sm">
-            <div className="h-12 w-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
-              <FileText className="h-6 w-6 text-primary" />
+          <div className="bg-white rounded-2xl p-8 border border-gray-100 shadow-lg">
+            <div className="h-14 w-14 rounded-lg bg-blue-50 flex items-center justify-center mb-4">
+              <FileText className="h-6 w-6 text-blue-600" />
             </div>
-            <h3 className="text-lg font-semibold mb-2 text-card-foreground">View All</h3>
-            <p className="text-muted-foreground">
+            <h3 className="text-xl font-semibold mb-2 text-slate-900">View All</h3>
+            <p className="text-slate-500">
               Access all your documents in one organized view
             </p>
           </div>
