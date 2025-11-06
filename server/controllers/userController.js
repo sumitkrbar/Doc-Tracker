@@ -1,6 +1,7 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
+import { generateOtpToUser } from '../services/otpService.js';
 
 const generateToken = (userId) =>{
     const payload = userId;
@@ -29,16 +30,20 @@ export const registerController = async (req, res) => {
             password: hashedPassword
         });
 
-        const token = generateToken(newUser._id.toString());
-        const userWithoutPassword = newUser.toObject();
-        delete userWithoutPassword.password;
+        const otp = await generateOtpToUser(email);
 
-        res.json({
-            success: true,
-            message: "Registration successful",
-            user: userWithoutPassword,
-            token
-        });
+        
+
+        // const token = generateToken(newUser._id.toString());
+        // const userWithoutPassword = newUser.toObject();
+        // delete userWithoutPassword.password;
+
+        // res.json({
+        //     success: true,
+        //     message: "Registration successful",
+        //     user: userWithoutPassword,
+        //     token
+        // });
 
     } catch (error) {
         console.error("Error in registerController:", error);

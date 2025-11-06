@@ -13,14 +13,24 @@ const userSchema = new mongoose.Schema({
   password:{
         type: String,
         required: true,
-},
+  },
   // storing reference to documents also if needed
   documents: [
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Document"
     }
-  ]
+  ],
+  otp: {
+    type: String,
+  },
+  otpExpiry: {
+    type: Date,
+  },
+  isVerified: {
+    type: Boolean,
+    default: false
+  }
 },{timestamps: true});
 
 export default mongoose.model("User", userSchema);
