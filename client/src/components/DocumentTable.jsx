@@ -67,7 +67,7 @@ const DocumentTable = ({ documents, loading = false }) => {
               <TableHead>CF Expiry</TableHead>
               <TableHead>NP Expiry</TableHead>
               <TableHead>Auth Expiry</TableHead>
-              <TableHead>Remarks</TableHead>
+              <TableHead className="w-64">Remarks</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -94,7 +94,9 @@ const DocumentTable = ({ documents, loading = false }) => {
                     {getExpiryBadge(doc.auth)}
                   </div>
                 </TableCell>
-                <TableCell className="max-w-xs truncate">{doc.remarks || "—"}</TableCell>
+                <TableCell className="max-w-[16rem] whitespace-normal">
+                  <div className="clamp-2 break-words" title={doc.remarks || ""}>{doc.remarks || "—"}</div>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
