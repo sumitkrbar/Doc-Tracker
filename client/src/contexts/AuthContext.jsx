@@ -45,16 +45,22 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-    const { data } = await api.post("/login", { email, password });
-      
-      if (data.success) {
+      const { data } = await api.post("/login", { email, password });
+
+      // If server indicates verification is required, return that info to caller
+      if (data && data.requiresVerification) {
+        return { requiresVerification: true, email: data.email, message: data.message };
+      }
+
+      if (data && data.success) {
         setToken(data.token);
         localStorage.setItem("token", data.token);
         setUser(data.user);
         localStorage.setItem("user", JSON.stringify(data.user));
-      } else {
-        throw new Error(data.message);
+        return { success: true };
       }
+
+      throw new Error(data.message || "Login failed");
     } catch (error) {
       throw new Error(error.response?.data?.message || error.message);
     }

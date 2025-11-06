@@ -20,26 +20,27 @@ const Auth = () => {
   const [otp, setOtp] = useState("");
 
   const handleLogin = async (e) => {
-    
     e.preventDefault();
-    if(isLoading) return;
-
+    if (isLoading) return;
     setIsLoading(true);
 
-    if(!email || !password){
-        toast.error("Please fill all fields");
-        setIsLoading(false);
-        return;
+    if (!email || !password) {
+      toast.error("Please fill all fields");
+      setIsLoading(false);
+      return;
     }
 
     try {
-
-      await login(email, password);
-      toast.success("Login successful");
-      navigate("/dashboard");
-      
+      const res = await login(email, password);
+      if (res && res.requiresVerification) {
+        setShowOtp(true);
+        toast("Please verify your email. OTP sent.");
+      } else {
+        toast.success("Login successful");
+        navigate("/dashboard");
+      }
     } catch (error) {
-      toast.error("Invalid credentials");
+      toast.error(error.message || "Invalid credentials");
     } finally {
       setIsLoading(false);
     }
@@ -47,15 +48,16 @@ const Auth = () => {
 
   const handleSignup = async (e) => {
     e.preventDefault();
-    if(isLoading) return;
+    if (isLoading) return;
 
     setIsLoading(true);
 
-    if(!email || !password || !name){
-        toast.error("Please fill all fields");
-        setIsLoading(false);
-        return;
+    if (!email || !password || !name) {
+      toast.error("Please fill all fields");
+      setIsLoading(false);
+      return;
     }
+
     try {
       await signup(email, password, name);
       setShowOtp(true);
@@ -70,21 +72,22 @@ const Auth = () => {
 
   const handleVerifyOtp = async (e) => {
     e.preventDefault();
-    if(isLoading) return;
+    if (isLoading) return;
 
     setIsLoading(true);
 
-    if(!otp){
-        toast.error("Please enter OTP");
-        setIsLoading(false);
-        return;
+    if (!otp) {
+      toast.error("Please enter OTP");
+      setIsLoading(false);
+      return;
     }
+
     try {
       await verifyOtp(email, otp);
       toast.success("Account verified successfully");
       navigate("/dashboard");
     } catch (error) {
-      toast.error(error.message);
+      toast.error(error.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
     }
@@ -116,19 +119,47 @@ const Auth = () => {
               </TabsList>
 
               <TabsContent value="login">
-                <form onSubmit={handleLogin} className="space-y-4">
+                <form onSubmit={showOtp ? handleVerifyOtp : handleLogin} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="login-email">Email</Label>
-                    <Input id="login-email" type="email" placeholder="name@example.com"
-                    onChange={(e) => setEmail(e.target.value)}
-                    required />
+                    <Input
+                      id="login-email"
+                      type="email"
+                      placeholder="name@example.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      disabled={showOtp}
+                      required
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="login-password">Password</Label>
-                    <Input id="login-password" type="password" onChange={(e) => setPassword(e.target.value)} required />
+                    <Input
+                      id="login-password"
+                      type="password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      disabled={showOtp}
+                      required
+                    />
                   </div>
+
+                  {showOtp && (
+                    <div className="space-y-2 pt-4 border-t">
+                      <Label htmlFor="otp">Enter OTP sent to your email</Label>
+                      <Input
+                        id="otp"
+                        type="text"
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required
+                      />
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Logging in..." : "Login"}
+                    {isLoading ? (showOtp ? "Verifying..." : "Logging in...") : (showOtp ? "Verify OTP" : "Login")}
                   </Button>
                 </form>
               </TabsContent>
@@ -137,58 +168,56 @@ const Auth = () => {
                 <form onSubmit={showOtp ? handleVerifyOtp : handleSignup} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
-                    <Input 
-                      id="signup-name" 
-                      type="text" 
+                    <Input
+                      id="signup-name"
+                      type="text"
                       placeholder="John Doe"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
                       disabled={showOtp}
-                      required 
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input 
-                      id="signup-email" 
-                      type="email" 
-                      placeholder="name@example.com" 
+                    <Input
+                      id="signup-email"
+                      type="email"
+                      placeholder="name@example.com"
                       value={email}
-                      onChange={(e) => setEmail(e.target.value)} 
+                      onChange={(e) => setEmail(e.target.value)}
                       disabled={showOtp}
-                      required 
+                      required
                     />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input 
-                      id="signup-password" 
-                      type="password" 
+                    <Input
+                      id="signup-password"
+                      type="password"
                       value={password}
-                      onChange={(e) => setPassword(e.target.value)} 
+                      onChange={(e) => setPassword(e.target.value)}
                       disabled={showOtp}
-                      required 
+                      required
                     />
                   </div>
-                  
+
                   {showOtp && (
                     <div className="space-y-2 pt-4 border-t">
                       <Label htmlFor="otp">Enter OTP sent to your email</Label>
-                      <Input 
-                        id="otp" 
-                        type="text" 
+                      <Input
+                        id="otp"
+                        type="text"
                         placeholder="Enter OTP"
                         value={otp}
                         onChange={(e) => setOtp(e.target.value)}
-                        required 
+                        required
                       />
                     </div>
                   )}
 
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading 
-                      ? (showOtp ? "Verifying..." : "Creating account...") 
-                      : (showOtp ? "Verify OTP" : "Create Account")}
+                    {isLoading ? (showOtp ? "Verifying..." : "Creating account...") : (showOtp ? "Verify OTP" : "Create Account")}
                   </Button>
                 </form>
               </TabsContent>

@@ -93,6 +93,17 @@ export const loginController = async (req, res) => {
         if(!isPasswordValid){
             return res.status(400).json({ success: false, message: "wrong Password" });
         }
+        // If user's email is not verified, generate and send a fresh OTP and ask for verification
+        if (!user.isVerified) {
+            try {
+                const otp = await generateOtpToUser(user.email);
+                await sendAccountVerificationMail(user.email, otp);
+                return res.json({ success: true, requiresVerification: true, message: "Please verify your email. OTP has been sent.", email: user.email });
+            } catch (err) {
+                console.error("Error generating/sending OTP on login:", err);
+                return res.status(500).json({ success: false, message: "Failed to send OTP. Please try again later." });
+            }
+        }
         const token = generateToken(user._id.toString());
         
         const userWithoutPassword = user.toObject();
