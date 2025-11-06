@@ -12,10 +12,12 @@ import { useAuth } from "../contexts/AuthContext";
 const Auth = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { login, signup } = useAuth();
+  const { login, signup, verifyOtp } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [name, setName] = useState("");
+  const [showOtp, setShowOtp] = useState(false);
+  const [otp, setOtp] = useState("");
 
   const handleLogin = async (e) => {
     
@@ -56,15 +58,36 @@ const Auth = () => {
     }
     try {
       await signup(email, password, name);
-      toast.success("Account created successfully");
-      navigate("/dashboard");
+      setShowOtp(true);
+      toast.success("Please check your email for OTP");
     } catch (error) {
-      toast.error("Signup failed");
+      toast.error(error.message);
       console.log(error);
     } finally {
       setIsLoading(false);
     }
+  };
 
+  const handleVerifyOtp = async (e) => {
+    e.preventDefault();
+    if(isLoading) return;
+
+    setIsLoading(true);
+
+    if(!otp){
+        toast.error("Please enter OTP");
+        setIsLoading(false);
+        return;
+    }
+    try {
+      await verifyOtp(email, otp);
+      toast.success("Account verified successfully");
+      navigate("/dashboard");
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -111,26 +134,61 @@ const Auth = () => {
               </TabsContent>
 
               <TabsContent value="signup">
-                <form onSubmit={handleSignup} className="space-y-4">
+                <form onSubmit={showOtp ? handleVerifyOtp : handleSignup} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="signup-name">Full Name</Label>
                     <Input 
                       id="signup-name" 
                       type="text" 
                       placeholder="John Doe"
+                      value={name}
                       onChange={(e) => setName(e.target.value)}
-                      required />
+                      disabled={showOtp}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-email">Email</Label>
-                    <Input id="signup-email" type="email" placeholder="name@example.com" onChange={(e) => setEmail(e.target.value)} required />
+                    <Input 
+                      id="signup-email" 
+                      type="email" 
+                      placeholder="name@example.com" 
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)} 
+                      disabled={showOtp}
+                      required 
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label htmlFor="signup-password">Password</Label>
-                    <Input id="signup-password" type="password" onChange={(e) => setPassword(e.target.value)} required />
+                    <Input 
+                      id="signup-password" 
+                      type="password" 
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)} 
+                      disabled={showOtp}
+                      required 
+                    />
                   </div>
+                  
+                  {showOtp && (
+                    <div className="space-y-2 pt-4 border-t">
+                      <Label htmlFor="otp">Enter OTP sent to your email</Label>
+                      <Input 
+                        id="otp" 
+                        type="text" 
+                        placeholder="Enter OTP"
+                        value={otp}
+                        onChange={(e) => setOtp(e.target.value)}
+                        required 
+                      />
+                    </div>
+                  )}
+
                   <Button type="submit" className="w-full" disabled={isLoading}>
-                    {isLoading ? "Creating account..." : "Create Account"}
+                    {isLoading 
+                      ? (showOtp ? "Verifying..." : "Creating account...") 
+                      : (showOtp ? "Verify OTP" : "Create Account")}
                   </Button>
                 </form>
               </TabsContent>

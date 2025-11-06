@@ -58,7 +58,6 @@ export const registerController = async (req, res) => {
 export const verifyOtpController = async (req, res) => {
     try {
         const { email, otp } = req.body;
-        console.log(email, otp);
         
         if(!email || !otp){
             throw new Error("Required fields are missing");

@@ -62,20 +62,33 @@ export const AuthProvider = ({ children }) => {
 
 
   const signup = async (email, password, name) => {
-    
-    try{
-  const { data } = await api.post(`/register`, {username: name, email, password})
-
-      if(data.success){
-          setUser(data.user);
-          localStorage.setItem("user", JSON.stringify(data.user));
-          setToken(data.token);
-          localStorage.setItem("token", data.token);
-      } else{
-          toast.error(data.message)
+    try {
+      const { data } = await api.post(`/register`, {username: name, email, password});
+      if (!data.success) {
+        throw new Error(data.message);
       }
-    }catch(error){
-          toast.error(error.message)
+      // Return email for OTP verification
+      return data.email;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message);
+    }
+  };
+
+  const verifyOtp = async (email, otp) => {
+    try {
+      const { data } = await api.post('/verify-otp', { email, otp });
+      if (data.success) {
+        // Only set user and token after OTP verification
+        setUser(data.user);
+        localStorage.setItem("user", JSON.stringify(data.user));
+        setToken(data.token);
+        localStorage.setItem("token", data.token);
+        return true;
+      } else {
+        throw new Error(data.message);
+      }
+    } catch (error) {
+      throw new Error(error.response?.data?.message || error.message);
     }
   };
 
@@ -89,7 +102,7 @@ export const AuthProvider = ({ children }) => {
   const isAuthenticated = !!user;
 
   return (
-    <AuthContext.Provider value={{ user, login, signup, logout, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, signup, verifyOtp, logout, isAuthenticated }}>
       {children}
     </AuthContext.Provider>
   );
