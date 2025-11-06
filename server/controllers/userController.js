@@ -1,7 +1,7 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
-import { generateOtpToUser } from '../services/otpService.js';
+import { generateOtpToUser, verifyOtpForUser } from '../services/otpService.js';
 import { sendAccountVerificationMail } from '../services/mailService.js';
 const generateToken = (userId) =>{
     const payload = userId;
@@ -52,7 +52,33 @@ export const registerController = async (req, res) => {
         console.error("Error in registerController:", error);
         res.status(500).json({ success: false, message: "Registration failed", error: error.message });
     } 
-};   
+};
+
+
+export const verifyOtpController = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        console.log(email, otp);
+        
+        if(!email || !otp){
+            throw new Error("Required fields are missing");
+        }
+        const user = await verifyOtpForUser(email, otp);
+
+        const token = generateToken(user._id.toString());
+        const userWithoutPassword = user.toObject();
+        delete userWithoutPassword.password;
+        res.json({
+            success: true,
+            message: "OTP verification successful",
+            user: userWithoutPassword,
+            token
+        });
+    } catch (error) {
+        console.error("Error in verifyOtpController:", error);
+        res.status(400).json({ success: false, message: "OTP verification failed", error: error.message });
+    }
+};
 
 export const loginController = async (req, res) => {
     try {        

@@ -16,3 +16,24 @@ export const generateOtpToUser = async (email) => {
 
     return otp;
 }
+
+export const verifyOtpForUser = async (email, otp) => {
+    const user = await User.findOne ({ email });
+    
+    if(!user || !user.otp || user.otpExpiry.getTime() < Date.now()){
+        throw new Error("Invalid or expired OTP");
+    }
+    
+    const isOtpValid = await bcrypt.compare(otp, user.otp);
+
+    if(!isOtpValid){
+        throw new Error("Invalid OTP");
+    }
+    
+    user.isVerified = true;
+    user.otp = undefined;
+    user.otpExpiry = undefined;
+    await user.save();
+
+    return user;
+}
