@@ -110,7 +110,8 @@ export const DocumentProvider = ({ children }) => {
         headers: { Authorization: token ? `Bearer ${token}` : "" },
         params,
       });
-
+      console.log("inside fucker");
+      
       if (data && data.success && Array.isArray(data.documents)) {
         const normalized = data.documents.map((d) => ({ ...d, id: d._id || d.id }));
         // do not overwrite the global documents state here — just return results
