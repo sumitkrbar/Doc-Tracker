@@ -18,6 +18,8 @@ const Dashboard = () => {
   const [isFilterOpen, setIsFilterOpen] = useState(false);
   const [filters, setFilters] = useState({});
   const [displayedDocuments, setDisplayedDocuments] = useState([]);
+  const [sortBy, setSortBy] = useState(null); // 'owner' | 'cf' | 'np' | 'auth'
+  const [sortOrder, setSortOrder] = useState("asc");
 
   
 
@@ -54,6 +56,51 @@ const Dashboard = () => {
     setFilters({});
     setDisplayedDocuments(getAllDocuments());
   };
+
+  const handleSort = (field) => {
+    if (sortBy === field) {
+      setSortOrder((o) => (o === "asc" ? "desc" : "asc"));
+    } else {
+      setSortBy(field);
+      setSortOrder("asc");
+    }
+  };
+
+  const sortedDocuments = (() => {
+    if (!displayedDocuments) return [];
+    const docs = [...displayedDocuments];
+    if (!sortBy) return docs;
+
+    const getValue = (d) => {
+      if (sortBy === "owner") return (d.owner || "").toLowerCase();
+      if (sortBy === "cf") return d.cf ? new Date(d.cf).getTime() : null;
+      if (sortBy === "np") return d.np ? new Date(d.np).getTime() : null;
+      if (sortBy === "auth") return d.auth ? new Date(d.auth).getTime() : null;
+      return null;
+    };
+
+    docs.sort((a, b) => {
+      const va = getValue(a);
+      const vb = getValue(b);
+
+      // Handle null/undefined dates: push them to the end
+      if (va === null && vb === null) return 0;
+      if (va === null) return 1;
+      if (vb === null) return -1;
+
+      if (typeof va === "string" && typeof vb === "string") {
+        return sortOrder === "asc" ? va.localeCompare(vb) : vb.localeCompare(va);
+      }
+
+      if (typeof va === "number" && typeof vb === "number") {
+        return sortOrder === "asc" ? va - vb : vb - va;
+      }
+
+      return 0;
+    });
+
+    return docs;
+  })();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
@@ -120,7 +167,26 @@ const Dashboard = () => {
           />
         )}
 
-  <DocumentTable documents={displayedDocuments} loading={documentsLoading} />
+        <div className="mb-3 flex items-center justify-end gap-2">
+          <span className="text-sm text-muted-foreground mr-auto">Sort by:</span>
+          <Button
+            size="sm"
+            variant={sortBy === null && documentsMode === "recent" ? "default" : "outline"}
+            onClick={() => {
+              setSortBy(null);
+              setSortOrder("asc");
+              setDisplayedDocuments(getAllDocuments());
+            }}
+          >
+            Latest
+          </Button>
+          <Button size="sm" variant={sortBy === "owner" ? "default" : "outline"} onClick={() => handleSort("owner")}>Name {sortBy === "owner" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
+          <Button size="sm" variant={sortBy === "cf" ? "default" : "outline"} onClick={() => handleSort("cf")}>CF {sortBy === "cf" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
+          <Button size="sm" variant={sortBy === "np" ? "default" : "outline"} onClick={() => handleSort("np")}>NP {sortBy === "np" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
+          <Button size="sm" variant={sortBy === "auth" ? "default" : "outline"} onClick={() => handleSort("auth")}>Auth {sortBy === "auth" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
+        </div>
+
+        <DocumentTable documents={sortedDocuments} loading={documentsLoading} />
       </main>
 
       <AddDocumentDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
