@@ -1,9 +1,11 @@
 import { Button } from "@/components/ui/button";
 import { FileText, Filter, Plus, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "@/contexts/AuthContext";
 
 const Index = () => {
   const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
@@ -15,9 +17,12 @@ const Index = () => {
         >
           DocuTrack Pro
         </h1>
-        <Link to="/auth">
-          <Button className="bg-blue-600 text-white hover:bg-blue-700">Get Started</Button>
-        </Link>
+        <Button
+          className="bg-blue-600 text-white hover:bg-blue-700"
+          onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth")}
+        >
+          Get Started
+        </Button>
       </nav>
 
       {/* Hero Section */}
@@ -38,12 +43,14 @@ const Index = () => {
           </p>
 
           <div className="flex gap-4 justify-center">
-            <Link to="/auth">
-              <Button size="lg" className="gap-2 bg-blue-600 text-white hover:bg-blue-700">
-                <Lock className="h-5 w-5" />
-                Get Started
-              </Button>
-            </Link>
+            <Button
+              size="lg"
+              className="gap-2 bg-blue-600 text-white hover:bg-blue-700"
+              onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth")}
+            >
+              <Lock className="h-5 w-5" />
+              Get Started
+            </Button>
           </div>
         </div>
 
