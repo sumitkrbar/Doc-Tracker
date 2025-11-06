@@ -4,11 +4,10 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/contexts/DocumentContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Plus, Filter, RefreshCw } from "lucide-react";
+import { LogOut, Plus, Filter, RefreshCw, FileText } from "lucide-react";
 import DocumentTable from "@/components/DocumentTable";
 import AddDocumentDialog from "@/components/AddDocumentDialog";
 import FilterPanel from "@/components/FilterPanel";
-
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const { documents, getAllDocuments, refreshDocuments, fetchFilteredDocuments, documentsMode, documentsLoading } = useDocuments();
@@ -107,13 +106,19 @@ const Dashboard = () => {
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div>
-              <h1 className="text-2xl font-bold text-foreground">Document Manager</h1>
-              <p className="text-sm text-muted-foreground">
-                Welcome back, {user?.username}
-              </p>
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
+                <FileText className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <span className="text-2xl font-bold text-foreground">DocManager</span>
+                <p className="text-sm text-muted-foreground">Manage your documents</p>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-4">
+              <span className="text-sm text-foreground">Welcome,
+                <span className="ml-2 font-semibold text-foreground">{user?.username}</span>
+              </span>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
