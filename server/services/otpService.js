@@ -1,4 +1,4 @@
-import User from "../models/userModel.js";
+import User from "../models/user.js";
 import bcrypt from "bcrypt";
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();

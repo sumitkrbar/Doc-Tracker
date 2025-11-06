@@ -2,7 +2,7 @@ import User from '../models/user.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken'; 
 import { generateOtpToUser } from '../services/otpService.js';
-
+import { sendAccountVerificationMail } from '../services/mailService.js';
 const generateToken = (userId) =>{
     const payload = userId;
     return jwt.sign(payload, process.env.JWT_SECRET)
@@ -31,9 +31,12 @@ export const registerController = async (req, res) => {
         });
 
         const otp = await generateOtpToUser(email);
+        await sendAccountVerificationMail(email, otp);
 
-        
-
+        res.status(201).json({
+            success: true,
+            message: "Registration successful. Please verify your email using the OTP sent.",
+        });
         // const token = generateToken(newUser._id.toString());
         // const userWithoutPassword = newUser.toObject();
         // delete userWithoutPassword.password;
