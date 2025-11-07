@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
   ChevronDownIcon,
@@ -33,6 +31,8 @@ function Calendar({
         className
       )}
       captionLayout={captionLayout}
+      startMonth={new Date(2000, 0)}
+      endMonth={new Date(2100, 0)}
       formatters={{
         formatMonthDropdown: (date) =>
           date.toLocaleString("default", { month: "short" }),

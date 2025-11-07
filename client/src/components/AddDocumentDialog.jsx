@@ -146,7 +146,8 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
                         selected={formData[field]}
                         onSelect={(date) => setFormData({ ...formData, [field]: date })}
                         initialFocus
-                        className="pointer-events-auto"
+                        className="rounded-lg border"
+                        captionLayout="dropdown"
                       />
                     </PopoverContent>
                   </Popover>

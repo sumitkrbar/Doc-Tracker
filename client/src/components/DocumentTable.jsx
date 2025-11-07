@@ -9,8 +9,11 @@ import {
 } from "@/components/ui/table";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { useState } from "react";
+import DocumentDetailsDialog from "@/components/DocumentDetailsDialog";
 
 const DocumentTable = ({ documents, loading = false }) => {
+  const [selected, setSelected] = useState(null);
   if (loading) {
     return (
       <Card className="p-12 text-center">
@@ -72,7 +75,7 @@ const DocumentTable = ({ documents, loading = false }) => {
           </TableHeader>
           <TableBody>
             {documents.map((doc) => (
-              <TableRow key={doc.id}>
+              <TableRow key={doc.id} className="cursor-pointer" onClick={() => setSelected(doc)}>
                 <TableCell className="font-medium">{doc.owner}</TableCell>
                 <TableCell>{doc.phone || "N/A"}</TableCell>
                 <TableCell className="font-mono">{doc.vehicleNumber}</TableCell>
@@ -95,13 +98,16 @@ const DocumentTable = ({ documents, loading = false }) => {
                   </div>
                 </TableCell>
                 <TableCell className="max-w-[16rem] whitespace-normal">
-                  <div className="clamp-2 break-words" title={doc.remarks || ""}>{doc.remarks || "—"}</div>
+                  <div className="clamp-2 wrap-break-word" title={doc.remarks || ""}>{doc.remarks || "—"}</div>
                 </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
       </div>
+      {selected && (
+        <DocumentDetailsDialog open={!!selected} onOpenChange={(v) => { if (!v) setSelected(null); }} document={selected} />
+      )}
     </Card>
   );
 };

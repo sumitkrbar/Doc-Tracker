@@ -75,6 +75,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, cfStart: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
@@ -99,6 +100,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, cfEnd: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
@@ -128,6 +130,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, npStart: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
@@ -152,6 +155,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, npEnd: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
@@ -181,6 +185,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, authStart: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
@@ -205,6 +210,7 @@ const FilterPanel = ({ filters, onApplyFilters, onClearFilters }) => {
                   onSelect={(date) => setLocalFilters({ ...localFilters, authEnd: date })}
                   initialFocus
                   className="pointer-events-auto"
+                  captionLayout="dropdown"
                 />
               </PopoverContent>
             </Popover>
