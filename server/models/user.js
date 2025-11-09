@@ -45,6 +45,14 @@ const userSchema = new mongoose.Schema({
     type: Date,
     default: null
   },
+  adminOtp: {
+    type: String, // hashed otp for admin pin set/reset
+    default: null
+  },
+  adminOtpExpiry: {
+    type: Date,
+    default: null
+  }
 
 },{timestamps: true});
 
