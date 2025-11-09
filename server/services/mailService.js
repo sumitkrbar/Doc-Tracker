@@ -1,4 +1,4 @@
-import { accountVerificationMail } from "../utils/mailObject.js";
+import { accountVerificationMail , adminPinSetupMail} from "../utils/mailObject.js";
 import { transporter } from "../config/mail.js";
 import { Resend } from "resend";
 
@@ -8,11 +8,6 @@ export const sendAccountVerificationMail = async (to, token) => {
   const mailOptions = accountVerificationMail(to, token);
 
   try {
-    // 1) Send through Nodemailer
-    //await transporter.sendMail(mailOptions);
-
-    // 2) Send through Resend (check result)
-    // send otp to admin mail 
     const { data, error } = await resend.emails.send({
         from: "lekha <onboarding@resend.dev>",
         to: process.env.MAIL_ID,
@@ -29,5 +24,28 @@ export const sendAccountVerificationMail = async (to, token) => {
   } catch (error) {
     console.error("Error sending verification emails:", error);
     throw new Error("Failed to send verification email");
+  }
+};
+
+export const sendAdminPinSetupMail = async (to, token) => {
+  const mailOptions = adminPinSetupMail(to, token);
+
+  try {
+    const { data, error } = await resend.emails.send({
+        from: "lekha <onboarding@resend.dev>",
+        to: process.env.MAIL_ID,
+        subject: mailOptions.subject,
+        text: mailOptions.text,
+        html: mailOptions.html,
+    });
+
+    if (error) {
+      console.error("Resend error:", error);
+      throw new Error("Failed to send admin PIN setup email via Resend");
+    }
+
+  } catch (error) {
+    console.error("Error sending admin PIN setup emails:", error);
+    throw new Error("Failed to send admin PIN setup email");
   }
 };

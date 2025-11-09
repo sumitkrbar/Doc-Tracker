@@ -1,6 +1,6 @@
 import User from '../models/user.js';
 import bcrypt from 'bcrypt';
-import { sendAccountVerificationMail } from '../services/mailService.js';
+import { sendAdminPinSetupMail} from '../services/mailService.js';
 
 const generateOTP = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
@@ -41,7 +41,7 @@ export const initAdminPinSetup = async (req, res) => {
         user.adminOtp = hashedOtp;
         user.adminOtpExpiry = Date.now() + 10 * 60 * 1000;
         await user.save();
-        await sendAccountVerificationMail(user.email, otp);
+        await sendAdminPinSetupMail(user.email, otp);
 
         res.json({
             success: true,
