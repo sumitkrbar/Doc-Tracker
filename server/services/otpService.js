@@ -23,6 +23,7 @@ export const verifyOtpForUser = async (email, otp) => {
     if(!user || !user.otp || user.otpExpiry.getTime() < Date.now()){
         throw new Error("Invalid or expired OTP");
     }
+    console.log(otp);
     
     const isOtpValid = await bcrypt.compare(otp, user.otp);
 
