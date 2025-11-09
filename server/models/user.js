@@ -23,14 +23,29 @@ const userSchema = new mongoose.Schema({
   ],
   otp: {
     type: String,
+    default: null
   },
   otpExpiry: {
     type: Date,
+    default: null
   },
   isVerified: {
     type: Boolean,
     default: false
-  }
+  },
+  adminPin: {
+    type: String, // hashed pin for admin access
+    default: null
+  },
+  isAdminPinSet: {
+    type: Boolean,
+    default: false
+  },
+  adminPinUpdatedAt: {
+    type: Date,
+    default: null
+  },
+
 },{timestamps: true});
 
 export default mongoose.model("User", userSchema);

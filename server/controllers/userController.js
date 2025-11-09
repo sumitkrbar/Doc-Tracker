@@ -120,4 +120,4 @@ export const loginController = async (req, res) => {
         console.error("Error in loginController:", error);
         res.status(500).json({ success: false, message: "Login failed", error: error.message });
     }
-};   
+};
