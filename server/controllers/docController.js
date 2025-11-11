@@ -24,13 +24,14 @@ const parseDate = (dateStr) => {
  */
 export const addDocController = async (req, res) => {
     try {
-        const { owner, phone, vehicleNumber, cf, np, auth, remarks } = req.body;
+        const { owner, phone, vehicleNumber, dor, chasisNumber, cf, np, auth, remarks, dir } = req.body;
         const userId = req.user._id;
         // Validate required fields
         validateDocumentInput({ owner, vehicleNumber, userId });
 
         // Format and create document
         const formattedVehicleNumber = vehicleNumber.toUpperCase().trim();
+        
         // Normalize phone to a Number when possible. The client may send phone as number or string.
         let phoneValue;
         if (phone !== undefined && phone !== null && String(phone).trim() !== "") {
@@ -40,14 +41,23 @@ export const addDocController = async (req, res) => {
             phoneValue = undefined;
         }
 
+        // Process dir (documents in record) array
+        let dirArray = [];
+        if (Array.isArray(dir)) {
+            dirArray = dir.filter(item => typeof item === 'string' && item.trim() !== '').map(item => item.trim());
+        }
+
         const newDocument = new Document({
             owner: typeof owner === 'string' ? owner.trim() : owner,
             phone: phoneValue,
             vehicleNumber: formattedVehicleNumber,
+            dor: parseDate(dor),
+            chasisNumber: chasisNumber ? String(chasisNumber).trim().toUpperCase() : undefined,
             cf: parseDate(cf),
             np: parseDate(np),
             auth: parseDate(auth),
             remarks: remarks ? String(remarks).trim() : null,
+            dir: dirArray,
             user: userId
         });
 
@@ -149,7 +159,6 @@ export const getFilteredDocsController = async (req, res) => {
 
         const authQuery = buildDateRangeQuery(authStart, authEnd);
         if (authQuery) query.auth = authQuery;
-        //console.log(query);
         
         // Execute query
         const documents = await Document.find(query)
@@ -277,11 +286,14 @@ export const updateDocController = async (req, res) => {
     try {
         const { docId } = req.params;
         const { _id: userId } = req.user;
-        const { owner, phone, vehicleNumber, cf, np, auth, remarks } = req.body;
+        const { owner, phone, vehicleNumber, dor, chasisNumber, cf, np, auth, remarks, dir } = req.body;
+        
         // Validate required fields
         validateDocumentInput({ owner, vehicleNumber, userId });
+        
         // Format vehicle number
         const formattedVehicleNumber = vehicleNumber.toUpperCase().trim();
+        
         // Normalize phone to a Number when possible. The client may send phone as number or string.
         let phoneValue;
         if (phone !== undefined && phone !== null && String(phone).trim() !== "") {
@@ -290,26 +302,39 @@ export const updateDocController = async (req, res) => {
         } else {
             phoneValue = undefined;
         }
+
+        // Process dir (documents in record) array
+        let dirArray = [];
+        if (Array.isArray(dir)) {
+            dirArray = dir.filter(item => typeof item === 'string' && item.trim() !== '').map(item => item.trim());
+        }
+        
         const updatedData = {
             owner: typeof owner === 'string' ? owner.trim() : owner,
             phone: phoneValue,
             vehicleNumber: formattedVehicleNumber,
+            dor: parseDate(dor),
+            chasisNumber: chasisNumber ? String(chasisNumber).trim().toUpperCase() : undefined,
             cf: parseDate(cf),
             np: parseDate(np),
             auth: parseDate(auth),
             remarks: remarks ? String(remarks).trim() : null,
+            dir: dirArray,
         };  
+        
         const document = await Document.findOneAndUpdate(
             { _id: docId, user: userId },
             updatedData,
             { new: true } // return the updated document
         );
+        
         if (!document) {
             return res.status(404).json({ 
                 success: false, 
                 message: "Document not found or unauthorized" 
             });
         }
+        
         console.log(`[UPDATE] User ${userId} updated document ${docId} at ${new Date().toISOString()}`);
 
         res.json({
