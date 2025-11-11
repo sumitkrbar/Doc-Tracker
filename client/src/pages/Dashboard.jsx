@@ -113,7 +113,7 @@ const Dashboard = () => {
                 <FileText className="h-6 w-6 text-primary-foreground" />
               </div>
               <div>
-                <span className="text-2xl font-bold text-foreground">DocManager</span>
+                <span className="text-2xl font-bold text-foreground">DocManager - Lekha</span>
                 <p className="text-sm text-muted-foreground">Manage your documents</p>
               </div>
             </div>

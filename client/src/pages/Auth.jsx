@@ -109,7 +109,7 @@ const Auth = () => {
             <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
               <FileText className="h-6 w-6 text-primary-foreground" />
             </div>
-            <span className="text-2xl font-bold text-foreground">DocManager</span>
+            <span className="text-2xl font-bold text-foreground">DocManager - Lekha</span>
           </div>
           <p className="text-muted-foreground">Manage your documents efficiently</p>
         </div>

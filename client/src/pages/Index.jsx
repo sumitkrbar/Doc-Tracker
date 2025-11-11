@@ -11,12 +11,15 @@ const Index = () => {
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
       {/* Navigation */}
       <nav className="container mx-auto px-6 py-6 flex justify-between items-center">
-        <h1
-          className="text-2xl font-extrabold text-blue-600 cursor-pointer hover:opacity-90 transition-opacity"
-          onClick={() => navigate("/")}
-        >
-          DocuTrack Pro
-        </h1>
+        <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-lg bg-primary flex items-center justify-center">
+                <FileText className="h-6 w-6 text-primary-foreground" />
+              </div>
+              <div>
+                <span className="text-2xl font-bold text-foreground">DocManager - Lekha</span>
+                
+              </div>
+            </div>
         <Button
           className="bg-blue-600 text-white hover:bg-blue-700"
           onClick={() => navigate(isAuthenticated ? "/dashboard" : "/auth")}
