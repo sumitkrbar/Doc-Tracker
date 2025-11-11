@@ -97,8 +97,8 @@ export const setAdminPin = async (req, res) => {
         const { pin } = req.body;
         if (!pin) throw new Error("PIN is required");
 
-        if (!(pin.length === 4)) {
-            return res.status(400).json({ success: false, message: "PIN must be 4 digits" });
+        if (!/^\d{4}$/.test(pin)) {
+            return res.status(400).json({ success: false, message: "PIN must be exactly 4 numeric digits" });
         }
 
         const user = await User.findById(req.user._id);

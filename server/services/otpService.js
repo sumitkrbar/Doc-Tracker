@@ -6,12 +6,13 @@ const generateOTP = () => {
 
 export const generateOtpToUser = async (email) => {
     const user = await User.findOne({ email });
+    if (!user) throw new Error("User not found");
 
     const otp = generateOTP();
     const hashedOtp = await bcrypt.hash(otp, 10);
 
     user.otp = hashedOtp;
-    user.otpExpiry = Date.now() + 5 * 60 * 1000;
+    user.otpExpiry = new Date(Date.now() + 5 * 60 * 1000);
     await user.save();
 
     return otp;
@@ -19,12 +20,13 @@ export const generateOtpToUser = async (email) => {
 
 export const verifyOtpForUser = async (email, otp) => {
     const user = await User.findOne ({ email });
-    
-    if(!user || !user.otp || user.otpExpiry.getTime() < Date.now()){
+    if(!user) throw new Error("User not found");
+
+    if(!user.otp || !user.otpExpiry || user.otpExpiry.getTime() < Date.now()){
         throw new Error("Invalid or expired OTP");
     }
-    console.log(otp);
-    
+
+    console.log("Verifying OTP for:", email);
     const isOtpValid = await bcrypt.compare(otp, user.otp);
 
     if(!isOtpValid){
