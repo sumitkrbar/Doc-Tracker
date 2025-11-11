@@ -12,6 +12,13 @@ const documentSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    dor: { // date of registration
+        type: Date,
+        default: null
+    },
+    chasisNumber:{
+        type: String,
+    },
     cf:{
         type: Date,
     },
@@ -24,11 +31,15 @@ const documentSchema = new mongoose.Schema({
     remarks:{
         type: String,
     },
+    dir: { // documents in record
+        type: [String],  
+        default: []   
+    },
     user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  }
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+        required: true
+    }
 
 
 },{timestamps: true});
