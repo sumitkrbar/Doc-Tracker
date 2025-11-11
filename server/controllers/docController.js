@@ -240,3 +240,31 @@ export const getRecentDocsController = async (req, res) => {
 };
 
 
+export const deleteDocController = async (req, res) => {
+    try {
+        const { docId } = req.params;
+        const { _id: userId } = req.user;
+
+        const document = await Document.findOneAndDelete({ _id: docId, user: userId });
+        if (!document) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Document not found or unauthorized" 
+            });
+        }
+
+        res.json({
+            success: true,
+            message: "Document deleted successfully"
+        });
+
+    } catch (error) {
+        console.error("Error in deleteDocController:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to delete document", 
+            error: error.message 
+        });
+    }
+}
+
