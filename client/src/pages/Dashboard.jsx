@@ -4,10 +4,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useDocuments } from "@/contexts/DocumentContext";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { LogOut, Plus, Filter, RefreshCw, FileText } from "lucide-react";
+import { LogOut, Plus, Filter, RefreshCw, FileText, Shield } from "lucide-react";
 import DocumentTable from "@/components/DocumentTable";
 import AddDocumentDialog from "@/components/AddDocumentDialog";
 import FilterPanel from "@/components/FilterPanel";
+import AdminAccessDialog from "@/components/AdminAccessDialog";
 const Dashboard = () => {
   const { user, logout } = useAuth();
   const { documents, getAllDocuments, refreshDocuments, fetchFilteredDocuments, documentsMode, documentsLoading } = useDocuments();
@@ -15,6 +16,7 @@ const Dashboard = () => {
 
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
+  const [isAdminDialogOpen, setIsAdminDialogOpen] = useState(false);
   const [filters, setFilters] = useState({});
   const [displayedDocuments, setDisplayedDocuments] = useState([]);
   const [sortBy, setSortBy] = useState(null); // 'owner' | 'cf' | 'np' | 'auth'
@@ -102,7 +104,7 @@ const Dashboard = () => {
   })();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background to-muted/20">
+    <div className="min-h-screen bg-linear-to-br from-background to-muted/20">
       <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-10">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
@@ -119,6 +121,15 @@ const Dashboard = () => {
               <span className="text-sm text-foreground">Welcome,
                 <span className="ml-2 font-semibold text-foreground">{user?.username}</span>
               </span>
+              <Button 
+                variant="outline" 
+                size="sm" 
+                onClick={() => setIsAdminDialogOpen(true)}
+                className="gap-2"
+              >
+                <Shield className="h-4 w-4" />
+                Admin Access
+              </Button>
               <Button variant="outline" size="sm" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Logout
@@ -195,6 +206,7 @@ const Dashboard = () => {
       </main>
 
       <AddDocumentDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />
+      <AdminAccessDialog open={isAdminDialogOpen} onOpenChange={setIsAdminDialogOpen} />
     </div>
   );
 };

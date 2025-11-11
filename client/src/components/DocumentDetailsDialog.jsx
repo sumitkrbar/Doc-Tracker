@@ -1,60 +1,345 @@
+import { useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
+import { Trash2, Edit, CalendarIcon, Save, X } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { toast } from "react-hot-toast";
+import PinVerificationDialog from "@/components/PinVerificationDialog";
+import { useDocuments } from "@/contexts/DocumentContext";
 
 const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
+  const [showPinDialog, setShowPinDialog] = useState(false);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null); // 'edit' | 'delete'
+  const { deleteDocument, updateDocument } = useDocuments();
+
+  const [editFormData, setEditFormData] = useState({
+    owner: "",
+    phone: "",
+    vehicleNumber: "",
+    cf: undefined,
+    np: undefined,
+    auth: undefined,
+    remarks: "",
+  });
+
   if (!document) return null;
 
+  const handleEditClick = () => {
+    setPendingAction("edit");
+    setShowPinDialog(true);
+  };
+
+  const handleDeleteClick = () => {
+    setShowConfirmDialog(true);
+  };
+
+  const handleConfirmDelete = () => {
+    setShowConfirmDialog(false);
+    setPendingAction("delete");
+    setShowPinDialog(true);
+  };
+
+  const handlePinVerified = async () => {
+    if (pendingAction === "delete") {
+      await performDelete();
+    } else if (pendingAction === "edit") {
+      enterEditMode();
+    }
+    setPendingAction(null);
+  };
+
+  const performDelete = async () => {
+    setIsDeleting(true);
+    try {
+      await deleteDocument(document.id || document._id);
+      toast.success("Document deleted successfully!");
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to delete document");
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const enterEditMode = () => {
+    setEditFormData({
+      owner: document.owner || "",
+      phone: document.phone || "",
+      vehicleNumber: document.vehicleNumber || "",
+      cf: document.cf ? new Date(document.cf) : undefined,
+      np: document.np ? new Date(document.np) : undefined,
+      auth: document.auth ? new Date(document.auth) : undefined,
+      remarks: document.remarks || "",
+    });
+    setIsEditing(true);
+  };
+
+  const handleCancelEdit = () => {
+    setIsEditing(false);
+    setEditFormData({
+      owner: "",
+      phone: "",
+      vehicleNumber: "",
+      cf: undefined,
+      np: undefined,
+      auth: undefined,
+      remarks: "",
+    });
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editFormData.owner || !editFormData.vehicleNumber) {
+      toast.error("Owner and Vehicle Number are required.");
+      return;
+    }
+
+    setIsSaving(true);
+    try {
+      await updateDocument(document.id || document._id, {
+        owner: editFormData.owner,
+        phone: editFormData.phone ? Number(editFormData.phone) : undefined,
+        vehicleNumber: editFormData.vehicleNumber,
+        cf: editFormData.cf,
+        np: editFormData.np,
+        auth: editFormData.auth,
+        remarks: editFormData.remarks,
+      });
+      toast.success("Document updated successfully!");
+      setIsEditing(false);
+      onOpenChange(false);
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Failed to update document");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-lg">
-        <DialogHeader>
-          <DialogTitle>Document Details</DialogTitle>
-          <DialogDescription>Details for {document.owner}</DialogDescription>
-        </DialogHeader>
+    <>
+      <Dialog open={open} onOpenChange={onOpenChange}>
+        <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>{isEditing ? "Edit Document" : "Document Details"}</DialogTitle>
+            <DialogDescription>
+              {isEditing ? "Update the document details below" : `Details for ${document.owner}`}
+            </DialogDescription>
+          </DialogHeader>
 
-        <div className="grid gap-3 py-4">
-          <div>
-            <h4 className="text-sm text-muted-foreground">Owner</h4>
-            <p className="font-medium">{document.owner}</p>
-          </div>
+          {isEditing ? (
+            // Edit Mode
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="owner">Owner *</Label>
+                  <Input
+                    id="owner"
+                    value={editFormData.owner}
+                    onChange={(e) => setEditFormData({ ...editFormData, owner: e.target.value })}
+                    placeholder="Owner name"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="phone">Phone</Label>
+                  <Input
+                    id="phone"
+                    type="tel"
+                    value={editFormData.phone}
+                    onChange={(e) => setEditFormData({ ...editFormData, phone: e.target.value })}
+                    placeholder="Phone number"
+                  />
+                </div>
+              </div>
 
-          <div>
-            <h4 className="text-sm text-muted-foreground">Phone</h4>
-            <p className="font-medium">{document.phone || "N/A"}</p>
-          </div>
+              <div className="space-y-2">
+                <Label htmlFor="vehicleNumber">Vehicle Number *</Label>
+                <Input
+                  id="vehicleNumber"
+                  value={editFormData.vehicleNumber}
+                  onChange={(e) => setEditFormData({ ...editFormData, vehicleNumber: e.target.value })}
+                  placeholder="ABC-1234"
+                  required
+                />
+              </div>
 
-          <div>
-            <h4 className="text-sm text-muted-foreground">Vehicle Number</h4>
-            <p className="font-mono font-medium">{document.vehicleNumber}</p>
-          </div>
+              <div className="grid grid-cols-3 gap-4">
+                {["cf", "np", "auth"].map((field) => (
+                  <div key={field} className="space-y-2">
+                    <Label>{field.toUpperCase()} Expiry</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !editFormData[field] && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <span className="block whitespace-normal">
+                            {editFormData[field] ? format(editFormData[field], "PPP") : "Pick date"}
+                          </span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={editFormData[field]}
+                          onSelect={(date) => setEditFormData({ ...editFormData, [field]: date })}
+                          initialFocus
+                          className="rounded-lg border"
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                ))}
+              </div>
 
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <h4 className="text-sm text-muted-foreground">CF Expiry</h4>
-              <p className="font-medium">{document.cf ? format(new Date(document.cf), "PPP") : "N/A"}</p>
+              <div className="space-y-2">
+                <Label htmlFor="remarks">Remarks</Label>
+                <Textarea
+                  id="remarks"
+                  value={editFormData.remarks}
+                  onChange={(e) => setEditFormData({ ...editFormData, remarks: e.target.value })}
+                  placeholder="Additional notes..."
+                  rows={3}
+                />
+              </div>
             </div>
-            <div>
-              <h4 className="text-sm text-muted-foreground">NP Expiry</h4>
-              <p className="font-medium">{document.np ? format(new Date(document.np), "PPP") : "N/A"}</p>
-            </div>
-            <div>
-              <h4 className="text-sm text-muted-foreground">Auth Expiry</h4>
-              <p className="font-medium">{document.auth ? format(new Date(document.auth), "PPP") : "N/A"}</p>
-            </div>
-          </div>
+          ) : (
+            // View Mode
+            <div className="grid gap-3 py-4">
+              <div>
+                <h4 className="text-sm text-muted-foreground">Owner</h4>
+                <p className="font-medium">{document.owner}</p>
+              </div>
 
-          <div>
-            <h4 className="text-sm text-muted-foreground">Remarks</h4>
-            <p className="whitespace-pre-wrap">{document.remarks || "—"}</p>
-          </div>
-        </div>
+              <div>
+                <h4 className="text-sm text-muted-foreground">Phone</h4>
+                <p className="font-medium">{document.phone || "N/A"}</p>
+              </div>
 
-        <DialogFooter>
-          <Button onClick={() => onOpenChange(false)}>Close</Button>
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+              <div>
+                <h4 className="text-sm text-muted-foreground">Vehicle Number</h4>
+                <p className="font-mono font-medium">{document.vehicleNumber}</p>
+              </div>
+
+              <div className="grid grid-cols-3 gap-4">
+                <div>
+                  <h4 className="text-sm text-muted-foreground">CF Expiry</h4>
+                  <p className="font-medium">{document.cf ? format(new Date(document.cf), "PPP") : "N/A"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-muted-foreground">NP Expiry</h4>
+                  <p className="font-medium">{document.np ? format(new Date(document.np), "PPP") : "N/A"}</p>
+                </div>
+                <div>
+                  <h4 className="text-sm text-muted-foreground">Auth Expiry</h4>
+                  <p className="font-medium">{document.auth ? format(new Date(document.auth), "PPP") : "N/A"}</p>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-sm text-muted-foreground">Remarks</h4>
+                <p className="whitespace-pre-wrap">{document.remarks || "—"}</p>
+              </div>
+            </div>
+          )}
+
+          <DialogFooter className="gap-2">
+            {isEditing ? (
+              <>
+                <Button 
+                  variant="outline" 
+                  onClick={handleCancelEdit}
+                  disabled={isSaving}
+                  className="gap-2"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button 
+                  onClick={handleSaveEdit}
+                  disabled={isSaving}
+                  className="gap-2"
+                >
+                  <Save className="h-4 w-4" />
+                  {isSaving ? "Saving..." : "Save Changes"}
+                </Button>
+              </>
+            ) : (
+              <>
+                <Button 
+                  variant="outline"
+                  onClick={handleEditClick}
+                  disabled={isDeleting}
+                  className="gap-2"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Button>
+                <Button 
+                  variant="destructive" 
+                  onClick={handleDeleteClick}
+                  disabled={isDeleting}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {isDeleting ? "Deleting..." : "Delete"}
+                </Button>
+                <Button onClick={() => onOpenChange(false)}>Close</Button>
+              </>
+            )}
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will permanently delete the document for <strong>{document.owner}</strong> ({document.vehicleNumber}).
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleConfirmDelete} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+              Continue
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <PinVerificationDialog
+        open={showPinDialog}
+        onOpenChange={setShowPinDialog}
+        onVerified={handlePinVerified}
+        action={pendingAction === "delete" ? "delete this document" : "edit this document"}
+      />
+    </>
   );
 };
 

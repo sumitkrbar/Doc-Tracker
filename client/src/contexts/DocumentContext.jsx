@@ -81,7 +81,6 @@ export const DocumentProvider = ({ children }) => {
       const params = {};
       if (filters.owner) params.owner = filters.owner;
       if (filters.vehicleNumber) params.vehicleNumber = filters.vehicleNumber;
-      // Support explicit start/end ranges when provided, otherwise fall back
       if (filters.cfStart) params.cfStart = new Date(filters.cfStart).toISOString();
       if (filters.cfEnd) params.cfEnd = new Date(filters.cfEnd).toISOString();
       if (!filters.cfStart && !filters.cfEnd && filters.cfExpiry) {
@@ -165,6 +164,69 @@ export const DocumentProvider = ({ children }) => {
     }
   };
 
+  // Delete a document by ID
+  const deleteDocument = async (docId) => {
+    try {
+      const token = localStorage.getItem("token");
+      const { data } = await api.delete(`/doc/${docId}`, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      if (!data || !data.success) {
+        throw new Error(data?.message || "Failed to delete document");
+      }
+
+      // Remove from local state
+      setDocuments((prev) => prev.filter((doc) => doc.id !== docId && doc._id !== docId));
+      return true;
+    } catch (error) {
+      console.error("deleteDocument error:", error);
+      throw error;
+    }
+  };
+
+  // Update a document by ID
+  const updateDocument = async (docId, document) => {
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {
+        owner: document.owner,
+        phone: document.phone,
+        vehicleNumber: document.vehicleNumber,
+        cf: document.cf ? new Date(document.cf).toISOString() : undefined,
+        np: document.np ? new Date(document.np).toISOString() : undefined,
+        auth: document.auth ? new Date(document.auth).toISOString() : undefined,
+        remarks: document.remarks,
+      };
+
+      const { data } = await api.put(`/doc/${docId}`, payload, {
+        headers: {
+          Authorization: token ? `Bearer ${token}` : "",
+        },
+      });
+
+      if (!data || !data.success) {
+        throw new Error(data?.message || "Failed to update document");
+      }
+
+      // Update in local state
+      const serverDoc = data.document;
+      const normalized = {
+        ...serverDoc,
+        id: serverDoc._id || serverDoc.id,
+      };
+      setDocuments((prev) =>
+        prev.map((doc) => (doc.id === docId || doc._id === docId ? normalized : doc))
+      );
+      return normalized;
+    } catch (error) {
+      console.error("updateDocument error:", error);
+      throw error;
+    }
+  };
+
   const getFilteredDocuments = (filters) => {
     return documents.filter(doc => {
       if (filters.owner && !doc.owner.toLowerCase().includes(filters.owner.toLowerCase())) {
@@ -201,7 +263,7 @@ export const DocumentProvider = ({ children }) => {
   const getAllDocuments = () => documents;
 
   return (
-    <DocumentContext.Provider value={{ documents, addDocument, getAllDocuments, refreshDocuments, fetchFilteredDocuments, documentsMode, documentsLoading }}>
+    <DocumentContext.Provider value={{ documents, addDocument, deleteDocument, updateDocument, getAllDocuments, refreshDocuments, fetchFilteredDocuments, documentsMode, documentsLoading }}>
       {children}
     </DocumentContext.Provider>
   );
