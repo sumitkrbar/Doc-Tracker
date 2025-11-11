@@ -14,10 +14,14 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
+
+const DIR_OPTIONS = ["RC", "NP", "PP", "SLD"];
+
 const AddDocumentDialog = ({ open, onOpenChange }) => {
   const { addDocument } = useDocuments();
 
@@ -25,13 +29,25 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
     owner: "",
     phone: "",
     vehicleNumber: "",
+      dor: undefined,
+      chasisNumber: "",
     cf: undefined,
     np: undefined,
     auth: undefined,
     remarks: "",
+      dir: [],
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+    const toggleDirOption = (option) => {
+      setFormData((prev) => ({
+        ...prev,
+        dir: prev.dir.includes(option)
+          ? prev.dir.filter((item) => item !== option)
+          : [...prev.dir, option],
+      }));
+    };
 
   const handleSubmit = async (e) => {
     console.log("add button clicked");
@@ -50,10 +66,13 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
         owner: formData.owner,
         phone: formData.phone ? Number(formData.phone) : undefined,
         vehicleNumber: formData.vehicleNumber,
+          dor: formData.dor,
+          chasisNumber: formData.chasisNumber,
         cf: formData.cf,
         np: formData.np,
         auth: formData.auth,
         remarks: formData.remarks,
+          dir: formData.dir,
       });
 
       toast.success("Document added — the document has been successfully added to the system.");
@@ -62,10 +81,13 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
         owner: "",
         phone: "",
         vehicleNumber: "",
+          dor: undefined,
+          chasisNumber: "",
         cf: undefined,
         np: undefined,
         auth: undefined,
         remarks: "",
+          dir: [],
       });
 
       onOpenChange(false);
@@ -123,6 +145,48 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
               />
             </div>
 
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="dor">Date of Registration</Label>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <Button
+                        variant="outline"
+                        className={cn(
+                          "w-full justify-start text-left font-normal",
+                          !formData.dor && "text-muted-foreground"
+                        )}
+                      >
+                        <CalendarIcon className="mr-2 h-4 w-4" />
+                        <span className="block whitespace-normal">
+                          {formData.dor ? format(formData.dor, "PPP") : "Pick date"}
+                        </span>
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={formData.dor}
+                        onSelect={(date) => setFormData({ ...formData, dor: date })}
+                        initialFocus
+                        className="rounded-lg border"
+                        captionLayout="dropdown"
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="chasisNumber">Chasis Number</Label>
+                  <Input
+                    id="chasisNumber"
+                    value={formData.chasisNumber}
+                    onChange={(e) => setFormData({ ...formData, chasisNumber: e.target.value })}
+                    placeholder="Enter chasis number"
+                  />
+                </div>
+              </div>
+
             <div className="grid grid-cols-3 gap-4">
               {["cf", "np", "auth"].map((field) => (
                 <div key={field} className="space-y-2">
@@ -154,6 +218,27 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
                 </div>
               ))}
             </div>
+
+              <div className="space-y-2">
+                <Label>Documents in Record</Label>
+                <div className="grid grid-cols-2 gap-3 p-4 border rounded-lg">
+                  {DIR_OPTIONS.map((option) => (
+                    <div key={option} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`dir-${option}`}
+                        checked={formData.dir.includes(option)}
+                        onCheckedChange={() => toggleDirOption(option)}
+                      />
+                      <label
+                        htmlFor={`dir-${option}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {option}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
 
             <div className="space-y-2">
               <Label htmlFor="remarks">Remarks</Label>

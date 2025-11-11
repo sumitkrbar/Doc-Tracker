@@ -16,12 +16,15 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Checkbox } from "@/components/ui/checkbox";
 import { format } from "date-fns";
 import { Trash2, Edit, CalendarIcon, Save, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { toast } from "react-hot-toast";
 import PinVerificationDialog from "@/components/PinVerificationDialog";
 import { useDocuments } from "@/contexts/DocumentContext";
+
+const DIR_OPTIONS = ["RC", "NP", "PP", "SLD"];
 
 const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
   const [showPinDialog, setShowPinDialog] = useState(false);
@@ -36,13 +39,25 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
     owner: "",
     phone: "",
     vehicleNumber: "",
+      dor: undefined,
+      chasisNumber: "",
     cf: undefined,
     np: undefined,
     auth: undefined,
     remarks: "",
+      dir: [],
   });
 
   if (!document) return null;
+
+    const toggleDirOption = (option) => {
+      setEditFormData((prev) => ({
+        ...prev,
+        dir: prev.dir.includes(option)
+          ? prev.dir.filter((item) => item !== option)
+          : [...prev.dir, option],
+      }));
+    };
 
   const handleEditClick = () => {
     setPendingAction("edit");
@@ -86,10 +101,13 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
       owner: document.owner || "",
       phone: document.phone || "",
       vehicleNumber: document.vehicleNumber || "",
+        dor: document.dor ? new Date(document.dor) : undefined,
+        chasisNumber: document.chasisNumber || "",
       cf: document.cf ? new Date(document.cf) : undefined,
       np: document.np ? new Date(document.np) : undefined,
       auth: document.auth ? new Date(document.auth) : undefined,
       remarks: document.remarks || "",
+        dir: document.dir || [],
     });
     setIsEditing(true);
   };
@@ -100,10 +118,13 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
       owner: "",
       phone: "",
       vehicleNumber: "",
+        dor: undefined,
+        chasisNumber: "",
       cf: undefined,
       np: undefined,
       auth: undefined,
       remarks: "",
+        dir: [],
     });
   };
 
@@ -119,10 +140,13 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
         owner: editFormData.owner,
         phone: editFormData.phone ? Number(editFormData.phone) : undefined,
         vehicleNumber: editFormData.vehicleNumber,
+          dor: editFormData.dor,
+          chasisNumber: editFormData.chasisNumber,
         cf: editFormData.cf,
         np: editFormData.np,
         auth: editFormData.auth,
         remarks: editFormData.remarks,
+          dir: editFormData.dir,
       });
       toast.success("Document updated successfully!");
       setIsEditing(false);
@@ -182,6 +206,48 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
                 />
               </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="dor">Date of Registration</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={cn(
+                            "w-full justify-start text-left font-normal",
+                            !editFormData.dor && "text-muted-foreground"
+                          )}
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          <span className="block whitespace-normal">
+                            {editFormData.dor ? format(editFormData.dor, "PPP") : "Pick date"}
+                          </span>
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={editFormData.dor}
+                          onSelect={(date) => setEditFormData({ ...editFormData, dor: date })}
+                          initialFocus
+                          className="rounded-lg border"
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="chasisNumber">Chasis Number</Label>
+                    <Input
+                      id="chasisNumber"
+                      value={editFormData.chasisNumber}
+                      onChange={(e) => setEditFormData({ ...editFormData, chasisNumber: e.target.value })}
+                      placeholder="Enter chasis number"
+                    />
+                  </div>
+                </div>
+
               <div className="grid grid-cols-3 gap-4">
                 {["cf", "np", "auth"].map((field) => (
                   <div key={field} className="space-y-2">
@@ -216,6 +282,27 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
                 ))}
               </div>
 
+                <div className="space-y-2">
+                  <Label>Documents in Record</Label>
+                  <div className="grid grid-cols-2 gap-3 p-4 border rounded-lg">
+                    {DIR_OPTIONS.map((option) => (
+                      <div key={option} className="flex items-center space-x-2">
+                        <Checkbox
+                          id={`dir-edit-${option}`}
+                          checked={editFormData.dir.includes(option)}
+                          onCheckedChange={() => toggleDirOption(option)}
+                        />
+                        <label
+                          htmlFor={`dir-edit-${option}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {option}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
               <div className="space-y-2">
                 <Label htmlFor="remarks">Remarks</Label>
                 <Textarea
@@ -246,6 +333,17 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
                 <p className="text-base font-semibold">{document.phone || "N/A"}</p>
               </div>
 
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Date of Registration</h4>
+                    <p className="text-base font-semibold">{document.dor ? format(new Date(document.dor), "dd MMM yyyy") : "N/A"}</p>
+                  </div>
+                  <div>
+                    <h4 className="text-sm font-medium text-muted-foreground mb-1">Chasis Number</h4>
+                    <p className="text-base font-mono font-semibold">{document.chasisNumber || "N/A"}</p>
+                  </div>
+                </div>
+
               <div className="border-t pt-4">
                 <h4 className="text-sm font-semibold text-foreground mb-3">Expiry Dates</h4>
                 <div className="grid grid-cols-3 gap-4">
@@ -263,6 +361,21 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
                   </div>
                 </div>
               </div>
+
+                <div className="border-t pt-4">
+                  <h4 className="text-sm font-semibold text-foreground mb-3">Documents in Record</h4>
+                  {document.dir && document.dir.length > 0 ? (
+                    <div className="flex flex-wrap gap-2">
+                      {document.dir.map((doc) => (
+                        <span key={doc} className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium">
+                          {doc}
+                        </span>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-sm text-muted-foreground">No documents recorded</p>
+                  )}
+                </div>
 
               <div className="border-t pt-4">
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Remarks</h4>

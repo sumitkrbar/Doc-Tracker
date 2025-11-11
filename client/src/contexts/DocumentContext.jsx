@@ -134,11 +134,16 @@ export const DocumentProvider = ({ children }) => {
         owner: document.owner,
         phone: document.phone,
         vehicleNumber: document.vehicleNumber,
+        dor: document.dor ? new Date(document.dor).toISOString() : undefined,
+        chasisNumber: document.chasisNumber || undefined,
         cf: document.cf ? new Date(document.cf).toISOString() : undefined,
         np: document.np ? new Date(document.np).toISOString() : undefined,
         auth: document.auth ? new Date(document.auth).toISOString() : undefined,
         remarks: document.remarks,
+        dir: document.dir || [],
       };
+      console.log("payload :" , payload);
+      
 
       const { data } = await api.post("/add-doc", payload, {
         headers: {
@@ -195,10 +200,13 @@ export const DocumentProvider = ({ children }) => {
         owner: document.owner,
         phone: document.phone,
         vehicleNumber: document.vehicleNumber,
+        dor: document.dor ? new Date(document.dor).toISOString() : undefined,
+        chasisNumber: document.chasisNumber || undefined,
         cf: document.cf ? new Date(document.cf).toISOString() : undefined,
         np: document.np ? new Date(document.np).toISOString() : undefined,
         auth: document.auth ? new Date(document.auth).toISOString() : undefined,
         remarks: document.remarks,
+        dir: document.dir || [],
       };
 
       const { data } = await api.put(`/doc/${docId}`, payload, {
