@@ -183,8 +183,16 @@ const Dashboard = () => {
           />
         )}
 
-        <div className="mb-3 flex items-center justify-end gap-2">
-          <span className="text-sm text-muted-foreground">Sort by:</span>
+        <div className="mb-3 flex items-center justify-between gap-4">
+          <div className="text-sm text-muted-foreground">
+            {Object.keys(filters).length > 0
+              ? `Showing filtered results (${sortedDocuments?.length || 0})`
+              : documentsMode === "recent"
+                ? `Showing recent documents (${sortedDocuments?.length || 0})`
+                : `Showing all documents (${sortedDocuments?.length || 0})`}
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground">Sort by:</span>
           <Button
             size="sm"
             variant={sortBy === null && documentsMode === "recent" ? "default" : "outline"}
@@ -200,9 +208,14 @@ const Dashboard = () => {
           <Button size="sm" variant={sortBy === "cf" ? "default" : "outline"} onClick={() => handleSort("cf")}>CF {sortBy === "cf" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
           <Button size="sm" variant={sortBy === "np" ? "default" : "outline"} onClick={() => handleSort("np")}>NP {sortBy === "np" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
           <Button size="sm" variant={sortBy === "auth" ? "default" : "outline"} onClick={() => handleSort("auth")}>Auth {sortBy === "auth" ? (sortOrder === "asc" ? "↑" : "↓") : ""}</Button>
+          </div>
         </div>
 
-        <DocumentTable documents={sortedDocuments} loading={documentsLoading} />
+        <DocumentTable 
+          documents={sortedDocuments} 
+          loading={documentsLoading} 
+          isFiltered={Object.keys(filters).length > 0}
+        />
       </main>
 
       <AddDocumentDialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen} />

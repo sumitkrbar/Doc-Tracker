@@ -12,7 +12,7 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import DocumentDetailsDialog from "@/components/DocumentDetailsDialog";
 
-const DocumentTable = ({ documents, loading = false }) => {
+const DocumentTable = ({ documents, loading = false, isFiltered = false }) => {
   const [selected, setSelected] = useState(null);
   if (loading) {
     return (
@@ -53,7 +53,11 @@ const DocumentTable = ({ documents, loading = false }) => {
   if (documents.length === 0) {
     return (
       <Card className="p-12 text-center">
-        <p className="text-muted-foreground">No documents found. Add document to get started.</p>
+        <p className="text-muted-foreground">
+          {isFiltered
+            ? "No results found. Change or remove filters."
+            : "No documents found. Add a document to get started."}
+        </p>
       </Card>
     );
   }
