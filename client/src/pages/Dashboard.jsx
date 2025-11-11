@@ -184,7 +184,7 @@ const Dashboard = () => {
         )}
 
         <div className="mb-3 flex items-center justify-end gap-2">
-          <span className="text-sm text-muted-foreground mr-auto">Sort by:</span>
+          <span className="text-sm text-muted-foreground">Sort by:</span>
           <Button
             size="sm"
             variant={sortBy === null && documentsMode === "recent" ? "default" : "outline"}
