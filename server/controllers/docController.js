@@ -12,6 +12,12 @@ const validateDocumentInput = ({ owner, vehicleNumber, userId }) => {
     }
 };
 
+const parseDate = (dateStr) => {
+    if (!dateStr) return null;
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? null : date;
+};
+
 /**
  * Controller to add a new document
  * @param {Object} req - Express request object
@@ -268,3 +274,57 @@ export const deleteDocController = async (req, res) => {
     }
 }
 
+export const updateDocController = async (req, res) => {
+    try {
+        const { docId } = req.params;
+        const { _id: userId } = req.user;
+        const { owner, phone, vehicleNumber, cf, np, auth, remarks } = req.body;
+        // Validate required fields
+        validateDocumentInput({ owner, vehicleNumber, userId });
+        // Format vehicle number
+        const formattedVehicleNumber = vehicleNumber.toUpperCase().trim();
+        // Normalize phone to a Number when possible. The client may send phone as number or string.
+        let phoneValue;
+        if (phone !== undefined && phone !== null && String(phone).trim() !== "") {
+            const parsed = Number(String(phone).trim());
+            phoneValue = Number.isNaN(parsed) ? undefined : parsed;
+        } else {
+            phoneValue = undefined;
+        }
+        const updatedData = {
+            owner: typeof owner === 'string' ? owner.trim() : owner,
+            phone: phoneValue,
+            vehicleNumber: formattedVehicleNumber,
+            cf: parseDate(cf),
+            np: parseDate(np),
+            auth: parseDate(auth),
+            remarks: remarks ? String(remarks).trim() : null,
+        };  
+        const document = await Document.findOneAndUpdate(
+            { _id: docId, user: userId },
+            updatedData,
+            { new: true } // return the updated document
+        );
+        if (!document) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Document not found or unauthorized" 
+            });
+        }
+        console.log(`[UPDATE] User ${userId} updated document ${docId} at ${new Date().toISOString()}`);
+        
+        res.json({
+            success: true,
+            message: "Document updated successfully",
+            document
+        });
+
+    } catch (error) {
+        console.error("Error in updateDocController:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to update document", 
+            error: error.message 
+        });
+    }
+};
