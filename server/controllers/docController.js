@@ -1,6 +1,5 @@
 import Document from '../models/document.js';
 
-// Validation helper
 const validateDocumentInput = ({ owner, vehicleNumber, userId }) => {
     const errors = [];
     if (!owner) errors.push('Owner is required');
@@ -45,10 +44,10 @@ export const addDocController = async (req, res) => {
             owner: typeof owner === 'string' ? owner.trim() : owner,
             phone: phoneValue,
             vehicleNumber: formattedVehicleNumber,
-            cf: cf || null,
-            np: np || null,
-            auth: auth || null,
-            remarks: typeof remarks === 'string' ? remarks.trim() : remarks,
+            cf: parseDate(cf),
+            np: parseDate(np),
+            auth: parseDate(auth),
+            remarks: remarks ? String(remarks).trim() : null,
             user: userId
         });
 
@@ -312,7 +311,7 @@ export const updateDocController = async (req, res) => {
             });
         }
         console.log(`[UPDATE] User ${userId} updated document ${docId} at ${new Date().toISOString()}`);
-        
+
         res.json({
             success: true,
             message: "Document updated successfully",
