@@ -229,40 +229,46 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
             </div>
           ) : (
             // View Mode
-            <div className="grid gap-3 py-4">
-              <div>
-                <h4 className="text-sm text-muted-foreground">Owner</h4>
-                <p className="font-medium">{document.owner}</p>
-              </div>
-
-              <div>
-                <h4 className="text-sm text-muted-foreground">Phone</h4>
-                <p className="font-medium">{document.phone || "N/A"}</p>
-              </div>
-
-              <div>
-                <h4 className="text-sm text-muted-foreground">Vehicle Number</h4>
-                <p className="font-mono font-medium">{document.vehicleNumber}</p>
-              </div>
-
-              <div className="grid grid-cols-3 gap-4">
+            <div className="grid gap-4 py-4">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <h4 className="text-sm text-muted-foreground">CF Expiry</h4>
-                  <p className="font-medium">{document.cf ? format(new Date(document.cf), "PPP") : "N/A"}</p>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Owner</h4>
+                  <p className="text-base font-semibold">{document.owner}</p>
                 </div>
                 <div>
-                  <h4 className="text-sm text-muted-foreground">NP Expiry</h4>
-                  <p className="font-medium">{document.np ? format(new Date(document.np), "PPP") : "N/A"}</p>
-                </div>
-                <div>
-                  <h4 className="text-sm text-muted-foreground">Auth Expiry</h4>
-                  <p className="font-medium">{document.auth ? format(new Date(document.auth), "PPP") : "N/A"}</p>
+                  <h4 className="text-sm font-medium text-muted-foreground mb-1">Vehicle Number</h4>
+                  <p className="text-base font-mono font-semibold">{document.vehicleNumber}</p>
                 </div>
               </div>
 
               <div>
-                <h4 className="text-sm text-muted-foreground">Remarks</h4>
-                <p className="whitespace-pre-wrap">{document.remarks || "—"}</p>
+                <h4 className="text-sm font-medium text-muted-foreground mb-1">Phone</h4>
+                <p className="text-base font-semibold">{document.phone || "N/A"}</p>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-semibold text-foreground mb-3">Expiry Dates</h4>
+                <div className="grid grid-cols-3 gap-4">
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">CF Expiry</h5>
+                    <p className="text-sm font-semibold">{document.cf ? format(new Date(document.cf), "dd MMM yyyy") : "N/A"}</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">NP Expiry</h5>
+                    <p className="text-sm font-semibold">{document.np ? format(new Date(document.np), "dd MMM yyyy") : "N/A"}</p>
+                  </div>
+                  <div className="bg-muted/30 p-3 rounded-lg">
+                    <h5 className="text-xs font-medium text-muted-foreground mb-1">Auth Expiry</h5>
+                    <p className="text-sm font-semibold">{document.auth ? format(new Date(document.auth), "dd MMM yyyy") : "N/A"}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="border-t pt-4">
+                <h4 className="text-sm font-medium text-muted-foreground mb-2">Remarks</h4>
+                <div className="bg-muted/30 p-3 rounded-lg">
+                  <p className="text-sm whitespace-pre-wrap">{document.remarks || "No remarks added"}</p>
+                </div>
               </div>
             </div>
           )}
