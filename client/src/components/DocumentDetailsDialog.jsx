@@ -139,6 +139,7 @@ const DocumentDetailsDialog = ({ open, onOpenChange, document }) => {
       await updateDocument(document.id || document._id, {
         owner: editFormData.owner,
         phone: editFormData.phone ? Number(editFormData.phone) : undefined,
+        vehicleNumber: editFormData.vehicleNumber,
           dor: editFormData.dor,
           chasisNumber: editFormData.chasisNumber,
         cf: editFormData.cf,
