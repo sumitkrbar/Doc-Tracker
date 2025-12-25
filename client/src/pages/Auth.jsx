@@ -62,7 +62,7 @@ const Auth = () => {
     try {
       await signup(email, password, name);
       setShowOtp(true);
-      toast.success("Please check your email for OTP");
+      toast.success("Account created. Please verify your email. OTP sent to admin/owner.");
     } catch (error) {
       toast.error(error.message);
       console.log(error);
@@ -88,6 +88,8 @@ const Auth = () => {
       toast.success("Account verified successfully");
       navigate("/dashboard");
     } catch (error) {
+      console.log("sumit error", error);
+      
       toast.error(error.message || "OTP verification failed");
     } finally {
       setIsLoading(false);
@@ -154,7 +156,7 @@ const Auth = () => {
 
                   {showOtp && (
                     <div className="space-y-2 pt-4 border-t">
-                      <Label htmlFor="otp">Enter OTP sent to your email</Label>
+                      <Label htmlFor="otp">Enter OTP sent to admin/owner email</Label>
                       <Input
                         id="otp"
                         type="text"
@@ -212,7 +214,7 @@ const Auth = () => {
 
                   {showOtp && (
                     <div className="space-y-2 pt-4 border-t">
-                      <Label htmlFor="otp">Enter OTP sent to your email</Label>
+                      <Label htmlFor="otp">Enter OTP sent to admin/owner email</Label>
                       <Input
                         id="otp"
                         type="text"

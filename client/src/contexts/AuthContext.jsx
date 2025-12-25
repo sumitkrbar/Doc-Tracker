@@ -94,6 +94,7 @@ export const AuthProvider = ({ children }) => {
         throw new Error(data.message);
       }
     } catch (error) {
+      console.log("error in auth context verifyOtp:", error);
       throw new Error(error.response?.data?.message || error.message);
     }
   };

@@ -188,7 +188,7 @@ const AddDocumentDialog = ({ open, onOpenChange }) => {
               </div>
 
             <div className="grid grid-cols-3 gap-4">
-              {["cf", "np", "auth"].map((field) => (
+              {["cf", "np", "auth", "puc", "pp/tp"].map((field) => (
                 <div key={field} className="space-y-2">
                   <Label>{field.toUpperCase()} Expiry</Label>
                   <Popover>
